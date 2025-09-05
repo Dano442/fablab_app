@@ -1,4 +1,4 @@
-import 'package:fablab_app/config/presentation/screens/home/home_screen.dart';
+import 'package:fablab_app/presentation/screens/home/home_screen.dart';
 import 'package:fablab_app/config/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -13,8 +13,8 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: AppTheme(selectedColor: 4 ).getTheme(),
-      home: const HomeScreen()
+      theme: AppTheme(selectedColor: 5 ).getTheme(),
+      home: HomeScreen()
     );
   }
 }
