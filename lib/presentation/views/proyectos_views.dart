@@ -5,18 +5,16 @@ class ProyectosViews extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Center(
-        child: Column(
-          children: [
-            Text('oa'),
-            FilledButton.tonal(
-              onPressed:(){
-              }, 
-              child: const Icon(Icons.add),
-            )
-          ],
-        ),
+    return Center(
+      child: Column(
+        children: [
+          Text('Proyectos'),
+          FilledButton.tonal(
+            onPressed:(){
+            }, 
+            child: const Icon(Icons.add),
+          )
+        ],
       ),
     );
   }

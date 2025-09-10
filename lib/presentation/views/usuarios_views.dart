@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-class HomeViews extends StatelessWidget {
-  const HomeViews({super.key});
+class UsuariosViews extends StatelessWidget {
+  const UsuariosViews({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
         children: [
-          Text('oaaa'),
+          Text('Usuarios'),
           FilledButton.tonal(
             onPressed:(){
             }, 

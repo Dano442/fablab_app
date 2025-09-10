@@ -1,42 +1,54 @@
-// import 'package:fablab_app/config/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
-class CustomBottomNavegation extends StatefulWidget {
-  const CustomBottomNavegation({super.key});
+class CustomBottomNavegation extends StatelessWidget {
+  final int currentIndex;
+  final ValueChanged<int> onTabSelected;
 
-  @override
-  State<CustomBottomNavegation> createState() => _CustomBottomNavegationState();
-}
-
-class _CustomBottomNavegationState extends State<CustomBottomNavegation> {
-    int selectedIndex = 0;
-
+  const CustomBottomNavegation({
+    super.key,
+    required this.currentIndex,
+    required this.onTabSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
-
     final colors = Theme.of(context).colorScheme;
 
     return BottomNavigationBar(
-      currentIndex: selectedIndex,
-      onTap: (value) {
-        setState(() {
-          selectedIndex = value;
-        });
-      },
+      currentIndex: currentIndex,
+      onTap: onTabSelected,
       elevation: 0,
       // type: BottomNavigationBarType.fixed,
-      // backgroundColor: Colors.white,
       selectedItemColor: Colors.black,
-      // unselectedItemColor: Colors.grey,
       showSelectedLabels: true,
       showUnselectedLabels: true,
       items: [
-        BottomNavigationBarItem(icon: const Icon(Icons.home), label: "Inicio", backgroundColor: colors.primary),
-        BottomNavigationBarItem(icon: Icon(Icons.amp_stories_rounded), label: "Proyectos", backgroundColor: colors.primary),
-        BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Gestión", backgroundColor: colors.primary),
-        BottomNavigationBarItem(icon: Icon(Icons.group), label: "Usuarios", backgroundColor: colors.primary),
-        BottomNavigationBarItem(icon: Icon(Icons.receipt), label: "Noticias", backgroundColor: colors.primary),        
-      ]);
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.home),
+          label: "Inicio",
+          backgroundColor: colors.primary,
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.amp_stories_rounded),
+          label: "Proyectos",
+          backgroundColor: colors.primary,
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.settings),
+          label: "Gestión",
+          backgroundColor: colors.primary,
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.group),
+          label: "Usuarios",
+          backgroundColor: colors.primary,
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.receipt),
+          label: "Noticias",
+          backgroundColor: colors.primary,
+        ),
+      ],
+    );
   }
 }

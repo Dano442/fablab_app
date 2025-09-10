@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-class HomeViews extends StatelessWidget {
-  const HomeViews({super.key});
+class GestionViews extends StatelessWidget {
+  const GestionViews({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
         children: [
-          Text('oaaa'),
+          Text('Gestion'),
           FilledButton.tonal(
             onPressed:(){
             }, 

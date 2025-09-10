@@ -1,4 +1,9 @@
 import 'package:fablab_app/config/menu/menu_items.dart';
+import 'package:fablab_app/presentation/views/gestion_views.dart';
+import 'package:fablab_app/presentation/views/noticias_views.dart';
+// import 'package:fablab_app/presentation/views/home_views.dart';
+import 'package:fablab_app/presentation/views/proyectos_views.dart';
+import 'package:fablab_app/presentation/views/usuarios_views.dart';
 import 'package:fablab_app/presentation/widgets/shared/custom_bottom_navegation.dart';
 import 'package:flutter/material.dart';
 import 'package:fablab_app/presentation/widgets/widgets.dart';
@@ -9,17 +14,31 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
-
+  int selectedIndex = 0;
 class _HomeScreenState extends State<HomeScreen> {
 
+  final screens = [
+    _HomeView(),
+    ProyectosViews(),
+    GestionViews(),
+    UsuariosViews(),
+    NoticiasViews()
+    ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bienvenido al Pansel Administrativo'),
+        title: const Text('Bienvenido al Panel Administrativo'),
       ),
-      body: const _HomeView(),
-      bottomNavigationBar: CustomBottomNavegation(),
+      body: screens[selectedIndex],
+      bottomNavigationBar: CustomBottomNavegation(
+        currentIndex: selectedIndex,
+        onTabSelected: (value) {
+          setState(() {
+            selectedIndex = value;
+          });
+        },
+      ),
     );
   }
 }
