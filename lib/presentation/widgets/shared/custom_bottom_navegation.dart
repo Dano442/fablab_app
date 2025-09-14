@@ -13,7 +13,7 @@ class CustomBottomNavegation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-
+ 
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTabSelected,
@@ -34,11 +34,6 @@ class CustomBottomNavegation extends StatelessWidget {
           backgroundColor: colors.primary,
         ),
         BottomNavigationBarItem(
-          icon: const Icon(Icons.settings),
-          label: "Gestión",
-          backgroundColor: colors.primary,
-        ),
-        BottomNavigationBarItem(
           icon: const Icon(Icons.group),
           label: "Usuarios",
           backgroundColor: colors.primary,
@@ -46,6 +41,12 @@ class CustomBottomNavegation extends StatelessWidget {
         BottomNavigationBarItem(
           icon: const Icon(Icons.receipt),
           label: "Noticias",
+          backgroundColor: colors.primary,
+        ),
+        
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.inventory_outlined),
+          label: "Inventario",
           backgroundColor: colors.primary,
         ),
       ],

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class GestionScreen extends StatelessWidget {
-  const GestionScreen({super.key});
+class InventarioScreen extends StatelessWidget {
+  const InventarioScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gestión de Proyectos'),
+        title: const Text('Inventario'),
       ),
       body: const Placeholder(),
     );

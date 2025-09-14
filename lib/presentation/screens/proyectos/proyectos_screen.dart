@@ -7,9 +7,9 @@ class ProyectosScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Proyectos'),
-      ),
-      body: const Placeholder(),
+        title: const Text('Gestión de Proyectos'),
+        
+      ), 
     );
   }
 }
