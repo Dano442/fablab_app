@@ -1,14 +1,14 @@
 import 'package:fablab_app/presentation/views/cards.dart';
 import 'package:flutter/material.dart';
 
-class InicioScreen extends StatelessWidget {
-  const InicioScreen({super.key});
+class MainHomeScreen extends StatelessWidget {
+  const MainHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Bienvenido al Panel Administrativo'),
+        title: Text('Bienvenido al Panel Administrativoo'),
       ),
 
       body: CardsViews(),

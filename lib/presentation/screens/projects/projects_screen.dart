@@ -1,7 +1,8 @@
+import 'package:fablab_app/presentation/views/cards.dart';
 import 'package:flutter/material.dart';
 
-class ProyectosScreen extends StatelessWidget {
-  const ProyectosScreen({super.key});
+class ProjectsScreen extends StatelessWidget {
+  const ProjectsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -9,7 +10,8 @@ class ProyectosScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Gestión de Proyectos'),
         
-      ), 
+      ),
+      body: CardsViews(), 
     );
   }
 }

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class InventarioScreen extends StatelessWidget {
-  const InventarioScreen({super.key});
+class UsersScreen extends StatelessWidget {
+  const UsersScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Inventario'),
+        title: const Text('Usuarios'),
       ),
       body: const Placeholder(),
     );
