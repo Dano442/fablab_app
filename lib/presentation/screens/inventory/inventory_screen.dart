@@ -5,9 +5,19 @@ class InventoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Inventario'),
+        backgroundColor: colors.primary,
+        title: Text(
+          'Inventario',
+          style: textTheme.titleLarge?.copyWith(
+            color: colors.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: const Placeholder(),
     );

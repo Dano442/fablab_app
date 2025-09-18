@@ -1,4 +1,4 @@
-import 'package:fablab_app/presentation/views/cards.dart';
+import 'cards_main_home.dart';
 import 'package:flutter/material.dart';
 
 class MainHomeScreen extends StatelessWidget {
@@ -6,12 +6,24 @@ class MainHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+
     return Scaffold(
+      backgroundColor: colors.surface,
       appBar: AppBar(
-        title: Text('Bienvenido al Panel Administrativoo'),
+        backgroundColor: colors.primary,
+        title: Text(
+          'Panel Administrativo',
+          style: textTheme.titleLarge?.copyWith(
+            color: colors.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
 
-      body: CardsViews(),
+      body: CardsMainHome(),
     );
   }
 }

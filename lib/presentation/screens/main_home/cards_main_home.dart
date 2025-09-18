@@ -7,8 +7,8 @@ const cards = <Map<String, dynamic>>[
   {'icon': Icons.pending_actions, 'label': 'Solicitudes Pendientes', 'value': '7'},
 ];
 
-class CardsViews extends StatelessWidget {
-  const CardsViews({super.key});
+class CardsMainHome extends StatelessWidget {
+  const CardsMainHome({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -57,18 +57,7 @@ Widget build(BuildContext context) {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: colors.primary.withAlpha(26),
-              shape: BoxShape.circle,
-            ),
-            padding: const EdgeInsets.all(12),
-            child: Icon(
-              icon,
-              size: 40,
-              color: colors.primary,
-            ),
-          ),
+          _CardMainStyle(colors: colors, icon: icon),
           const SizedBox(height: 10),
           Text(
             label,
@@ -94,4 +83,30 @@ Widget build(BuildContext context) {
     ),
   );
 }
+}
+
+class _CardMainStyle extends StatelessWidget {
+  const _CardMainStyle({
+    required this.colors,
+    required this.icon,
+  });
+
+  final ColorScheme colors;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.primary.withAlpha(26),
+        shape: BoxShape.circle,
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Icon(
+        icon,
+        size: 40,
+        color: colors.primary,
+      ),
+    );
+  }
 }

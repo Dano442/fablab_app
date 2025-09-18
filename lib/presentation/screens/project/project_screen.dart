@@ -1,0 +1,75 @@
+import 'package:fablab_app/presentation/screens/project/project_card.dart';
+import 'package:flutter/material.dart';
+
+class Project{
+  final String imageUrl;
+  final String name;
+  final String status;
+  final String participants;
+
+  Project({
+    required this.imageUrl,
+    required this.name,
+    required this.participants,
+    required this.status
+  });
+}
+
+class ProjectScreen extends StatelessWidget {
+  const ProjectScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+
+    final List<Project> projects = [
+      Project(
+        imageUrl: 'https://picsum.photos/300/200',
+        name: 'Sistema de Gestión',
+        status: 'En Progreso',
+        participants: '5 participantes',
+      ),
+      Project(
+        imageUrl: 'https://picsum.photos/300/200',
+        name: 'App de Inventario',
+        status: 'Finalizado',
+        participants: '3 participantes',
+      ),
+      Project(
+        imageUrl:  'https://picsum.photos/300/200',
+        name: 'Página Web Clientes',
+        status: 'Pendiente',
+        participants: '8 participantes',
+      ),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: colors.primary,
+        title: Text(
+          'Proyectos',
+          style: textTheme.titleLarge?.copyWith(
+            color: colors.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: ListView.separated(
+        padding: const EdgeInsets.all(16),
+        itemCount: projects.length,
+        separatorBuilder: (_, _) => const SizedBox(height: 16),
+        itemBuilder: (context, index) {
+          final project = projects[index];
+          return ProjectCard(
+            imageUrl: project.imageUrl,
+            projectName: project.name,
+            projectStatus: project.status,
+            participants: project.participants,
+          );
+        },
+      ),
+    );
+  }
+}
