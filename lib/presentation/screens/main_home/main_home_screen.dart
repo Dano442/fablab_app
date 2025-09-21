@@ -1,4 +1,4 @@
-import 'cards_main_home.dart';
+import 'main_home_card.dart';
 import 'package:flutter/material.dart';
 
 class MainHomeScreen extends StatelessWidget {
@@ -9,25 +9,26 @@ class MainHomeScreen extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-
     return Scaffold(
-      backgroundColor: colors.surface,
-      appBar: AppBar(
-        backgroundColor: colors.primary,
-        title: Text(
-          'Panel Administrativo',
-          style: textTheme.titleLarge?.copyWith(
-            color: colors.onPrimary,
-            fontWeight: FontWeight.bold,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Panel Administrativo',
+                style: textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colors.onSurface,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Expanded(child: CardsMainHome()),
+            ],
           ),
         ),
       ),
-
-      body: CardsMainHome(),
     );
   }
 }
-
-
-
-

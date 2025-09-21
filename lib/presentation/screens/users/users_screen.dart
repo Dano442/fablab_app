@@ -55,37 +55,45 @@ class UsersScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: colors.surface,
-      appBar: AppBar(
-        backgroundColor: colors.primary,
-        title: Text(
-          'Usuarios',
-          style: textTheme.titleLarge?.copyWith(
-            color: colors.onPrimary,
-            fontWeight: FontWeight.bold,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center, 
+        children: [
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Text(
+              'Lista de usuarios',
+              style: textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: colors.onSurface,
+              ),
+            ),
           ),
-        ),
-      ),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: users.length,
-        separatorBuilder: (_, __) => Divider(
-          thickness: 1,
-          height: 16,
-          color: colors.outlineVariant.withValues(),
-        ),
-        itemBuilder: (context, index) {
-          final user = users[index];
-          return UserCard(
-            user: user,
-            onEdit: () {
-              debugPrint('Editar usuario: ${user.name}');
-            },
-            onDelete: () {
-              debugPrint('Eliminar usuario: ${user.name}');
-            },
-          );
-        },
+          
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: users.length,
+              separatorBuilder: (_, __) => Divider(
+                thickness: 1,
+                height: 16,
+                color: colors.outlineVariant.withValues(),
+              ),
+              itemBuilder: (context, index) {
+                final user = users[index];
+                return UserCard(
+                  user: user,
+                  onEdit: () {
+                    debugPrint('Editar usuario: ${user.name}');
+                  },
+                  onDelete: () {
+                    debugPrint('Eliminar usuario: ${user.name}');
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

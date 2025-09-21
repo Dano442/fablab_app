@@ -1,7 +1,7 @@
 import 'package:fablab_app/presentation/screens/project/project_card.dart';
 import 'package:flutter/material.dart';
 
-class Project{
+class Project {
   final String imageUrl;
   final String name;
   final String status;
@@ -11,7 +11,7 @@ class Project{
     required this.imageUrl,
     required this.name,
     required this.participants,
-    required this.status
+    required this.status,
   });
 }
 
@@ -22,7 +22,6 @@ class ProjectScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
 
     final List<Project> projects = [
       Project(
@@ -38,7 +37,7 @@ class ProjectScreen extends StatelessWidget {
         participants: '3 participantes',
       ),
       Project(
-        imageUrl:  'https://picsum.photos/300/200',
+        imageUrl: 'https://picsum.photos/300/200',
         name: 'Página Web Clientes',
         status: 'Pendiente',
         participants: '8 participantes',
@@ -46,29 +45,37 @@ class ProjectScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: colors.primary,
-        title: Text(
-          'Proyectos',
-          style: textTheme.titleLarge?.copyWith(
-            color: colors.onPrimary,
-            fontWeight: FontWeight.bold,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Text(
+              'Lista de Proyectos',
+              style: textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: colors.onSurface,
+              ),
+            ),
           ),
-        ),
-      ),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: projects.length,
-        separatorBuilder: (_, _) => const SizedBox(height: 16),
-        itemBuilder: (context, index) {
-          final project = projects[index];
-          return ProjectCard(
-            imageUrl: project.imageUrl,
-            projectName: project.name,
-            projectStatus: project.status,
-            participants: project.participants,
-          );
-        },
+          
+
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: projects.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 16),
+              itemBuilder: (context, index) {
+                final project = projects[index];
+                return ProjectCard(
+                  imageUrl: project.imageUrl,
+                  projectName: project.name,
+                  projectStatus: project.status,
+                  participants: project.participants,
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
