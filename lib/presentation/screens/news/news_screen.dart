@@ -52,16 +52,8 @@ class _NewsScreenState extends State<NewsScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Título de la sección en el body
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Text(
-              "Noticias",
-              style: textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: colors.onSurface,
-              ),
-            ),
+            padding: const EdgeInsets.symmetric(vertical: 8),
           ),
           
           // Barra de búsqueda
@@ -84,7 +76,6 @@ class _NewsScreenState extends State<NewsScreen> {
             ),
           ),
           
-          // Lista de noticias
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.all(12),

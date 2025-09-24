@@ -1,63 +1,64 @@
+// Archivo: profile_screen.dart
+import 'package:fablab_app/presentation/screens/profile/profile_details_screen';
+import 'package:fablab_app/presentation/screens/profile/profile_themes_screen.dart';
 import 'package:flutter/material.dart';
 
+
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+ const ProfileScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Configuraciones'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-      ),
-      body: ListView(
-        children: const [
-          // Sección de cuenta
-          ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Perfil'),
-            subtitle: Text('Edita tu información personal'),
-            trailing: Icon(Icons.arrow_forward_ios),
-          ),
-          Divider(),
+ @override
+ Widget build(BuildContext context) {
+  return Scaffold(
+   appBar: AppBar(
+    title: const Text('Configuraciones'),
+    backgroundColor: Theme.of(context).colorScheme.primary,
+    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+   ),
+   body: ListView(
+    children: [
+     // Opción de Perfil
+     ListTile(
+      leading: const Icon(Icons.person),
+      title: const Text('Perfil'),
+      subtitle: const Text('Edita tu información personal'),
+      trailing: const Icon(Icons.arrow_forward_ios),
+      onTap: () {
+       Navigator.push(
+        context,
+        MaterialPageRoute(
+         builder: (context) => const ProfileDetailsScreen(),
+        ),
+       );
+      },
+     ),
+     const Divider(),
 
-          // Sección de notificaciones
-          ListTile(
-            leading: Icon(Icons.notifications),
-            title: Text('Notificaciones'),
-            subtitle: Text('Ajusta tus preferencias de notificaciones'),
-            trailing: Icon(Icons.arrow_forward_ios),
-          ),
-          Divider(),
-
-          // Sección de privacidad
-          ListTile(
-            leading: Icon(Icons.lock),
-            title: Text('Privacidad'),
-            subtitle: Text('Configura la privacidad de tu cuenta'),
-            trailing: Icon(Icons.arrow_forward_ios),
-          ),
-          Divider(),
-
-          // Sección de ayuda
-          ListTile(
-            leading: Icon(Icons.help_outline),
-            title: Text('Ayuda y Soporte'),
-            subtitle: Text('Preguntas frecuentes, contacto, etc.'),
-            trailing: Icon(Icons.arrow_forward_ios),
-          ),
-          Divider(),
-
-          // Sección de cerrar sesión
-          ListTile(
-            leading: Icon(Icons.logout),
-            title: Text('Cerrar sesión'),
-            subtitle: Text('Sal de tu cuenta'),
-            // No tiene trailing icon porque es una acción directa
-          ),
-        ],
-      ),
-    );
-  }
+     ListTile(
+      leading: const Icon(Icons.palette),
+      title: const Text('Temas'),
+      subtitle: const Text('Ajusta el tema que más te guste'),
+      trailing: const Icon(Icons.arrow_forward_ios),
+      onTap: () {
+       Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfileThemesScreen()),
+       );
+      },
+     ),
+     const Divider(),
+     
+     // Opción de Cerrar Sesión
+     ListTile(
+      leading: const Icon(Icons.logout),
+      title: const Text('Cerrar sesión'),
+      subtitle: const Text('Sal de tu cuenta'),
+      onTap: () {
+       // Lógica para cerrar la sesión
+      },
+     ),
+    ],
+   ),
+  );
+ }
 }

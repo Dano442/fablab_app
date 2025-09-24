@@ -31,7 +31,7 @@ class RequestScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min, 
               children: [
-                // Nombre del proyecto
+                
                 Text(
                   projectName,
                   style: TextStyle(
@@ -42,7 +42,7 @@ class RequestScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
 
-                // Fecha
+              
                 Text(
                   "Fecha: $date",
                   style: const TextStyle(
@@ -52,7 +52,7 @@ class RequestScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // Descripción
+              
                 Text(
                   description,
                   style: const TextStyle(
@@ -61,7 +61,7 @@ class RequestScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // Botones de acción
+               
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [

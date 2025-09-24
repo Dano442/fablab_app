@@ -31,7 +31,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     final filteredTools = _tools
         .where((tool) =>
@@ -43,19 +42,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Texto de título
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Text(
-              "Inventario de Herramientas",
-              style: textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: colors.onSurface,
-              ),
-            ),
+            padding: const EdgeInsets.symmetric(vertical: 8),
           ),
 
-          // Barra de búsqueda
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: TextField(
@@ -79,7 +69,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
           const SizedBox(height: 8),
 
-          // Lista de herramientas
+
           Expanded(
             child: ListView.builder(
               itemCount: filteredTools.length,

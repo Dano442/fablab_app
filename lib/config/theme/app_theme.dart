@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-// Colores de los temas
 const colorList = <Color>[
-  Colors.blue,
-  Colors.teal,
-  Colors.green,
   Colors.red,
+  Colors.orange,
+  Colors.amber,
+  Colors.green,
+  Colors.teal,
+  Colors.cyan,
+  Colors.blue,
   Colors.purple,
   Colors.deepPurple,
-  Colors.orange,
-  Colors.pink,
-  Colors.pinkAccent,
+  Colors.pink
 ];
 
 class AppTheme {
@@ -19,9 +19,7 @@ class AppTheme {
 
   AppTheme({
     this.selectedColor = 0 
-    }): assert (selectedColor >= 0, 'El color seleccionado debe ser mayor que 0'),
-        assert(selectedColor <colorList.length,
-        'El color seleccionado debe ser menor que ${colorList.length - 1} ');
+    });
 
 
     ThemeData getTheme() => ThemeData(

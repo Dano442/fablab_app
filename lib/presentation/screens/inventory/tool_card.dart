@@ -34,7 +34,7 @@ class ToolCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Imagen segura (usa Image.network en vez de FadeInImage)
+
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
@@ -46,7 +46,7 @@ class ToolCard extends StatelessWidget {
                   return Container(
                     width: 60,
                     height: 60,
-                    color: colors.surfaceVariant,
+                    color: colors.surfaceContainerHighest,
                     child: const Icon(Icons.broken_image, size: 28),
                   );
                 },
