@@ -56,7 +56,6 @@ class _NewsScreenState extends State<NewsScreen> {
             padding: const EdgeInsets.symmetric(vertical: 8),
           ),
           
-          // Barra de búsqueda
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: TextField(

@@ -97,13 +97,9 @@ class _UsersScreenState extends State<UsersScreen> {
           
           Expanded(
             child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.all(12),
               itemCount: filteredUsers.length,
-              separatorBuilder: (_, __) => Divider(
-                thickness: 1,
-                height: 16,
-                color: colors.outlineVariant,
-              ),
+              separatorBuilder: (_, __) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
                 final user = filteredUsers[index]; 
                 return UserCard(

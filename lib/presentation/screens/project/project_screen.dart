@@ -23,7 +23,7 @@ class ProjectScreen extends StatefulWidget {
 }
 
 class _ProjectScreenState extends State<ProjectScreen> {
-  // Move the data and state variables inside the State class
+  
   final List<Project> _projects = [
     Project(
       imageUrl: 'https://picsum.photos/300/200?random=1',
@@ -51,7 +51,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    // Filter the projects list based on the search query
+  
     final filteredProjects = _projects
         .where((project) =>
             project.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
@@ -61,13 +61,16 @@ class _ProjectScreenState extends State<ProjectScreen> {
 
     return Scaffold(
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Search Bar
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Buscar proyecto...',
+                hintText: "Buscar usuario...",
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: colors.surfaceContainerHighest,
@@ -77,10 +80,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                 ),
               ),
               onChanged: (value) {
-                // Update the state with the new search query
-                setState(() {
-                  _searchQuery = value;
-                });
+                setState(() => _searchQuery = value);
               },
             ),
           ),
@@ -88,7 +88,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
           // List of filtered projects
           Expanded(
             child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.all(12),
               itemCount: filteredProjects.length, // Use the filtered list count
               separatorBuilder: (_, __) => const SizedBox(height: 16),
               itemBuilder: (context, index) {

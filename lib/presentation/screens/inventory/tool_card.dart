@@ -74,8 +74,8 @@ class ToolCard extends StatelessWidget {
                   Text(
                     tool.available ? 'Disponible' : 'No disponible',
                     style: textTheme.bodyMedium?.copyWith(
-                      color: tool.available ? colors.primary : colors.error,
-                      fontWeight: FontWeight.w600,
+                      color: tool.available ? colors.secondary : colors.error,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
