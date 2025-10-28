@@ -19,12 +19,12 @@ class MainApp extends StatefulWidget {
 
 class MainAppState extends State<MainApp> {
   int _selectedColorIndex = 0;
-  final _storage = const FlutterSecureStorage(); // 👈 almacenamiento seguro
+  final _storage = const FlutterSecureStorage(); // 
 
   @override
   void initState() {
     super.initState();
-    _loadTheme(); // 🔹 carga el tema guardado
+    _loadTheme(); //
   }
 
   // --- Cargar el índice del tema desde el almacenamiento ---
@@ -37,7 +37,7 @@ class MainAppState extends State<MainApp> {
     }
   }
 
-  // --- Cambiar y guardar el nuevo tema ---
+  // Cambiar y guardar el nuevo tema
   void setTheme(int newIndex) async {
     setState(() {
       _selectedColorIndex = newIndex;

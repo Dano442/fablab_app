@@ -23,7 +23,7 @@ class ProfileScreen extends StatelessWidget {
         elevation: 2,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: colors.onPrimary),
-          // 👇 Usa GoRouter para volver al home (en vez de pop)
+          
           onPressed: () => context.go('/main_home'),
         ),
       ),

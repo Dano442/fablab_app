@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:fablab_app/presentation/widgets/shared/custom_bottom_navigation.dart';
 
 class HomeScreen extends StatelessWidget {
-  final Widget child; // <- importante para GoRouter
+  final Widget child; 
 
   const HomeScreen({
     super.key,
@@ -15,7 +15,7 @@ class HomeScreen extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    // Compatibilidad con GoRouter 13.x
+  
     final String location = GoRouterState.of(context).uri.toString();
     final currentIndex = _getCurrentIndex(location);
     final showBottomNav = currentIndex != -1;
@@ -44,7 +44,7 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
 
-      // El contenido dinámico según la ruta activa
+
       body: child,
 
       // Barra de navegación inferior

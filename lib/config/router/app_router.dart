@@ -11,9 +11,10 @@ import 'package:fablab_app/presentation/screens/users/users_screen.dart';
 import 'package:fablab_app/presentation/screens/news/news_screen.dart';
 import 'package:fablab_app/presentation/screens/inventory/inventory_screen.dart';
 
-// 👇 Se necesita esta clave para rutas que van fuera del Shell
+
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
+// Rutas de la barra de navegación inferior
 final appRouter = GoRouter(
   initialLocation: '/main_home',
   navigatorKey: _rootNavigatorKey,
@@ -29,7 +30,7 @@ final appRouter = GoRouter(
       ],
     ),
 
-    // --- RUTAS INDEPENDIENTES (fuera del Shell) ---
+    // Rutas independientes
     GoRoute(
       path: '/profile',
       parentNavigatorKey: _rootNavigatorKey,

@@ -9,7 +9,7 @@ class RequestScreen extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    // Datos de ejemplo (más adelante se reemplazarán por datos del CRUD)
+  
     final String projectName = "Diseño de Prototipo de Robot";
     final String date = "21 de septiembre de 2025";
     final String description =
@@ -30,7 +30,7 @@ class RequestScreen extends StatelessWidget {
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: colors.onPrimary),
-          // 👇 Vuelve al Home con GoRouter
+          
           onPressed: () => context.go('/main_home'),
         ),
       ),
@@ -47,7 +47,7 @@ class RequestScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // --- Nombre del proyecto ---
+                //  Nombre del proyecto 
                 Text(
                   projectName,
                   style: textTheme.headlineSmall?.copyWith(
@@ -57,7 +57,7 @@ class RequestScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
 
-                // --- Fecha ---
+                // Fecha
                 Text(
                   "Fecha: $date",
                   style: textTheme.bodyMedium?.copyWith(
@@ -66,7 +66,7 @@ class RequestScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
 
-                // --- Descripción ---
+                //  Descripción 
                 Text(
                   description,
                   style: textTheme.bodyLarge?.copyWith(
@@ -76,7 +76,7 @@ class RequestScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
 
-                // --- Botones de acción ---
+                //  Botones de acción 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [

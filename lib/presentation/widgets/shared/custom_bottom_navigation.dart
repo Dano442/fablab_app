@@ -18,16 +18,16 @@ class CustomBottomNavigation extends StatelessWidget {
       currentIndex: currentIndex,
       onTap: onTabSelected,
       elevation: 0,
-      type: BottomNavigationBarType.fixed, // 👈 se define explícitamente
+      type: BottomNavigationBarType.fixed,
 
-      // 🎨 Estilos mantenidos de tu versión original
+
       selectedItemColor: Colors.black,
       unselectedItemColor: colors.onPrimary.withOpacity(0.7),
       showSelectedLabels: true,
       showUnselectedLabels: true,
       backgroundColor: colors.primary,
 
-      // Íconos igual que antes
+
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
