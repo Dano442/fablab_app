@@ -1,64 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:fablab_app/presentation/screens/inventory/inventory_screen.dart';
-import 'package:fablab_app/presentation/screens/main_home/main_home_screen.dart';
-import 'package:fablab_app/presentation/screens/news/news_screen.dart';
-import 'package:fablab_app/presentation/screens/profile/profile_screen.dart';
-import 'package:fablab_app/presentation/screens/project/project_screen.dart';
-import 'package:fablab_app/presentation/screens/request/request_screen.dart';
-import 'package:fablab_app/presentation/screens/users/users_screen.dart';
-import 'package:fablab_app/presentation/widgets/shared/custom_bottom_navegation.dart';
+import 'package:go_router/go_router.dart';
+import 'package:fablab_app/presentation/widgets/shared/custom_bottom_navigation.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  final Widget child; // <- importante para GoRouter
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-
-  final List<Widget> _screens = const [
-    MainHomeScreen(),
-    ProjectScreen(),
-    UsersScreen(),
-    NewsScreen(),
-    InventoryScreen(),
-  ];
-
-
-  final ProfileScreen _profileScreen = const ProfileScreen();
-  final RequestScreen _requestScreen = const RequestScreen();
-
-  int _selectedIndex = 0;
-  bool _showCustomScreen = false; 
-  Widget? _customScreen;
-
-  void _navigateToScreen(int index) {
-    setState(() {
-      _selectedIndex = index;
-      _showCustomScreen = false; 
-      _customScreen = null;
-    });
-  }
-
-  void _openProfile() {
-    setState(() {
-      _customScreen = _profileScreen;
-      _showCustomScreen = true;
-    });
-  }
-
-  void _openRequest() {
-    setState(() {
-      _customScreen = _requestScreen;
-      _showCustomScreen = true;
-    });
-  }
+  const HomeScreen({
+    super.key,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
+    // Compatibilidad con GoRouter 13.x
+    final String location = GoRouterState.of(context).uri.toString();
+    final currentIndex = _getCurrentIndex(location);
+    final showBottomNav = currentIndex != -1;
 
     return Scaffold(
       appBar: AppBar(
@@ -66,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 2,
         leading: IconButton(
           icon: Icon(Icons.person, color: colors.onPrimary),
-          onPressed: _openProfile,
+          onPressed: () => context.go('/profile'),
         ),
         title: Text(
           "FabLab",
@@ -79,15 +39,50 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.notifications, color: colors.onPrimary),
-            onPressed: _openRequest, 
+            onPressed: () => context.go('/request'),
           ),
         ],
       ),
-      body: _showCustomScreen ? _customScreen! : _screens[_selectedIndex],
-      bottomNavigationBar: CustomBottomNavegation(
-        currentIndex: _selectedIndex,
-        onTabSelected: _navigateToScreen,
-      ),
+
+      // El contenido dinámico según la ruta activa
+      body: child,
+
+      // Barra de navegación inferior
+      bottomNavigationBar: showBottomNav
+          ? CustomBottomNavigation(
+              currentIndex: currentIndex,
+              onTabSelected: (index) => _onItemTapped(context, index),
+            )
+          : null,
     );
+  }
+
+  void _onItemTapped(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        context.go('/main_home');
+        break;
+      case 1:
+        context.go('/projects');
+        break;
+      case 2:
+        context.go('/users');
+        break;
+      case 3:
+        context.go('/news');
+        break;
+      case 4:
+        context.go('/inventory');
+        break;
+    }
+  }
+
+  int _getCurrentIndex(String location) {
+    if (location.startsWith('/main_home')) return 0;
+    if (location.startsWith('/projects')) return 1;
+    if (location.startsWith('/users')) return 2;
+    if (location.startsWith('/news')) return 3;
+    if (location.startsWith('/inventory')) return 4;
+    return -1;
   }
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class CustomBottomNavegation extends StatelessWidget {
+class CustomBottomNavigation extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTabSelected;
 
-  const CustomBottomNavegation({
+  const CustomBottomNavigation({
     super.key,
     required this.currentIndex,
     required this.onTabSelected,
@@ -13,41 +13,41 @@ class CustomBottomNavegation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
- 
+
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTabSelected,
       elevation: 0,
-      // type: BottomNavigationBarType.fixed,
+      type: BottomNavigationBarType.fixed, // 👈 se define explícitamente
+
+      // 🎨 Estilos mantenidos de tu versión original
       selectedItemColor: Colors.black,
+      unselectedItemColor: colors.onPrimary.withOpacity(0.7),
       showSelectedLabels: true,
       showUnselectedLabels: true,
-      items: [
+      backgroundColor: colors.primary,
+
+      // Íconos igual que antes
+      items: const [
         BottomNavigationBarItem(
-          icon: const Icon(Icons.home),
+          icon: Icon(Icons.home),
           label: "Inicio",
-          backgroundColor: colors.primary,
         ),
         BottomNavigationBarItem(
-          icon: const Icon(Icons.amp_stories_rounded),
+          icon: Icon(Icons.amp_stories_rounded),
           label: "Proyectos",
-          backgroundColor: colors.primary,
         ),
         BottomNavigationBarItem(
-          icon: const Icon(Icons.group),
+          icon: Icon(Icons.group),
           label: "Usuarios",
-          backgroundColor: colors.primary,
         ),
         BottomNavigationBarItem(
-          icon: const Icon(Icons.receipt),
+          icon: Icon(Icons.receipt),
           label: "Noticias",
-          backgroundColor: colors.primary,
         ),
-        
         BottomNavigationBarItem(
-          icon: const Icon(Icons.inventory_outlined),
+          icon: Icon(Icons.inventory_outlined),
           label: "Inventario",
-          backgroundColor: colors.primary,
         ),
       ],
     );

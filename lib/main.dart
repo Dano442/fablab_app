@@ -1,7 +1,7 @@
-// Archivo: main.dart
-import 'package:fablab_app/presentation/screens/home/home_screen.dart';
-import 'package:fablab_app/config/theme/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fablab_app/config/theme/app_theme.dart';
+import 'package:fablab_app/config/router/app_router.dart';
 
 void main() {
   runApp(const MainApp());
@@ -19,20 +19,40 @@ class MainApp extends StatefulWidget {
 
 class MainAppState extends State<MainApp> {
   int _selectedColorIndex = 0;
+  final _storage = const FlutterSecureStorage(); // 👈 almacenamiento seguro
 
+  @override
+  void initState() {
+    super.initState();
+    _loadTheme(); // 🔹 carga el tema guardado
+  }
 
-  void setTheme(int newIndex) {
+  // --- Cargar el índice del tema desde el almacenamiento ---
+  Future<void> _loadTheme() async {
+    final savedIndex = await _storage.read(key: 'themeIndex');
+    if (savedIndex != null) {
+      setState(() {
+        _selectedColorIndex = int.tryParse(savedIndex) ?? 0;
+      });
+    }
+  }
+
+  // --- Cambiar y guardar el nuevo tema ---
+  void setTheme(int newIndex) async {
     setState(() {
       _selectedColorIndex = newIndex;
     });
+    await _storage.write(key: 'themeIndex', value: newIndex.toString());
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    final theme = AppTheme(selectedColor: _selectedColorIndex).getTheme();
+
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      theme: AppTheme(selectedColor: _selectedColorIndex).getTheme(),
-      home: const HomeScreen(),
+      theme: theme,
+      routerConfig: appRouter,
     );
   }
 }
