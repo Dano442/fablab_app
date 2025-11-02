@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fablab_app/presentation/screens/users/users_screen.dart'; // Importa la clase User
+import 'package:fablab_app/domain/models/user_model.dart';
 
 class UserCard extends StatelessWidget {
-  final User user;
+  final UserModel user;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 

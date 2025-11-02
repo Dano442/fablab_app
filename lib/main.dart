@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fablab_app/config/theme/app_theme.dart';
 import 'package:fablab_app/config/router/app_router.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(const ProviderScope(child: MainApp())); // 👈 Riverpod global
 }
 
 class MainApp extends StatefulWidget {
@@ -19,15 +20,15 @@ class MainApp extends StatefulWidget {
 
 class MainAppState extends State<MainApp> {
   int _selectedColorIndex = 0;
-  final _storage = const FlutterSecureStorage(); // 
+  final _storage = const FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
-    _loadTheme(); //
+    _loadTheme();
   }
 
-  // --- Cargar el índice del tema desde el almacenamiento ---
+  /// Carga el tema guardado en almacenamiento seguro
   Future<void> _loadTheme() async {
     final savedIndex = await _storage.read(key: 'themeIndex');
     if (savedIndex != null) {
@@ -37,7 +38,7 @@ class MainAppState extends State<MainApp> {
     }
   }
 
-  // Cambiar y guardar el nuevo tema
+  /// Cambia y guarda el nuevo tema
   void setTheme(int newIndex) async {
     setState(() {
       _selectedColorIndex = newIndex;
@@ -52,7 +53,7 @@ class MainAppState extends State<MainApp> {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       theme: theme,
-      routerConfig: appRouter,
+      routerConfig: appRouter, // 👈 usa las rutas con Splash/Login/Home
     );
   }
 }

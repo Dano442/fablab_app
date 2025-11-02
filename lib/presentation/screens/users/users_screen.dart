@@ -1,23 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fablab_app/domain/models/user_model.dart';
+import 'package:fablab_app/data/services/user_service.dart';
 import 'package:fablab_app/presentation/screens/users/user_card.dart';
-
-class User {
-  final String imageUrl;
-  final String name;
-  final String rut;
-  final String career;
-  final String role;
-  final String project;
-
-  User({
-    required this.imageUrl,
-    required this.name,
-    required this.rut,
-    required this.career,
-    required this.role,
-    required this.project,
-  });
-}
+import 'package:fablab_app/presentation/screens/users/user_form.dart';
 
 class UsersScreen extends StatefulWidget {
   const UsersScreen({super.key});
@@ -27,40 +12,16 @@ class UsersScreen extends StatefulWidget {
 }
 
 class _UsersScreenState extends State<UsersScreen> {
-  final List<User> users = [
-    User(
-      imageUrl: 'https://picsum.photos/200?random=1',
-      name: 'Daniel Ronceros',
-      rut: '12.345.678-9',
-      career: 'Ing. Civil Industrial',
-      role: 'Administrador',
-      project: 'App de Inventario',
-    ),
-    User(
-      imageUrl: 'https://picsum.photos/200?random=2',
-      name: 'Alexis Pérez',
-      rut: '13.456.789-0',
-      career: 'Diseño Gráfico',
-      role: 'Administrador',
-      project: 'Página Web Clientes',
-    ),
-    User(
-      imageUrl: 'https://picsum.photos/200?random=3',
-      name: 'María Jose Gutiérrez',
-      rut: '14.567.890-1',
-      career: 'Ing. en Informática',
-      role: 'Usuario',
-      project: 'Sistema de Gestión',
-    ),
-  ];
-
+  final UserService _userService = UserService();
   String _searchQuery = "";
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    final filteredUsers = users
+    //  Filtrar usuarios
+    final filteredUsers = _userService
+        .getAllUsers()
         .where((user) =>
             user.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
             user.rut.toLowerCase().contains(_searchQuery.toLowerCase()) ||
@@ -70,12 +31,15 @@ class _UsersScreenState extends State<UsersScreen> {
         .toList();
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addUser,
+        backgroundColor: colors.primary,
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-          ),
+          const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: TextField(
@@ -94,25 +58,72 @@ class _UsersScreenState extends State<UsersScreen> {
               },
             ),
           ),
-          
+          const SizedBox(height: 8),
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(12),
-              itemCount: filteredUsers.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 16),
-              itemBuilder: (context, index) {
-                final user = filteredUsers[index]; 
-                return UserCard(
-                  user: user,
-                  onEdit: () {
-                    debugPrint('Editar usuario: ${user.name}');
-                  },
-                  onDelete: () {
-                    debugPrint('Eliminar usuario: ${user.name}');
-                  },
-                );
-              },
-            ),
+            child: filteredUsers.isEmpty
+                ? const Center(child: Text('No hay usuarios disponibles'))
+                : ListView.separated(
+                    padding: const EdgeInsets.all(12),
+                    itemCount: filteredUsers.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 16),
+                    itemBuilder: (context, index) {
+                      final user = filteredUsers[index];
+                      return UserCard(
+                        user: user,
+                        onEdit: () => _editUser(user),
+                        onDelete: () => _deleteUser(user.id),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  //  Crear usuario nuevo
+  void _addUser() {
+    showDialog(
+      context: context,
+      builder: (_) => UserForm(
+        onSubmit: (newUser) {
+          setState(() => _userService.addUser(newUser));
+        },
+      ),
+    );
+  }
+
+  //  Editar usuario
+  void _editUser(UserModel user) {
+    showDialog(
+      context: context,
+      builder: (_) => UserForm(
+        user: user,
+        onSubmit: (updatedUser) {
+          setState(() => _userService.updateUser(updatedUser));
+        },
+      ),
+    );
+  }
+
+  //  Eliminar usuario
+  void _deleteUser(String id) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Confirmar eliminación'),
+        content: const Text('¿Deseas eliminar este usuario?'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              setState(() => _userService.deleteUser(id));
+              Navigator.pop(context);
+            },
+            child: const Text('Eliminar'),
           ),
         ],
       ),
