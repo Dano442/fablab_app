@@ -1,19 +1,8 @@
-import 'package:fablab_app/presentation/screens/project/project_card.dart';
 import 'package:flutter/material.dart';
-
-class Project {
-  final String imageUrl;
-  final String name;
-  final String status;
-  final String participants;
-
-  Project({
-    required this.imageUrl,
-    required this.name,
-    required this.participants,
-    required this.status,
-  });
-}
+import 'package:fablab_app/domain/models/project_model.dart';
+import 'package:fablab_app/presentation/screens/project/project_form.dart';
+import 'package:fablab_app/presentation/screens/project/project_card.dart';
+import 'package:fablab_app/data/services/project_service.dart';
 
 class ProjectScreen extends StatefulWidget {
   const ProjectScreen({super.key});
@@ -23,54 +12,102 @@ class ProjectScreen extends StatefulWidget {
 }
 
 class _ProjectScreenState extends State<ProjectScreen> {
-  
-  final List<Project> _projects = [
-    Project(
-      imageUrl: 'https://picsum.photos/300/200?random=1',
-      name: 'Sistema de Gestión',
-      status: 'En Progreso',
-      participants: '5 participantes',
-    ),
-    Project(
-      imageUrl: 'https://picsum.photos/300/200?random=2',
-      name: 'App de Inventario',
-      status: 'Finalizado',
-      participants: '3 participantes',
-    ),
-    Project(
-      imageUrl: 'https://picsum.photos/300/200?random=3',
-      name: 'Página Web Clientes',
-      status: 'Pendiente',
-      participants: '8 participantes',
-    ),
-  ];
-
+  final ProjectService _service = ProjectService();
   String _searchQuery = "";
+
+  // --- Agregar proyecto ---
+  void _addProject(ProjectModel project) {
+    if (!mounted) return;
+    setState(() => _service.addProject(project));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Proyecto agregado')),
+    );
+  }
+
+  // --- Editar proyecto ---
+  void _editProject(ProjectModel project) {
+    if (!mounted) return;
+    setState(() => _service.updateProject(project));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Proyecto actualizado')),
+    );
+  }
+
+  // --- Eliminar proyecto (fix pantallazo negro) ---
+  Future<void> _deleteProject(String id) async {
+    if (!mounted) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Eliminar Proyecto'),
+        content: const Text(
+          '¿Estás seguro de que deseas eliminar este proyecto?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text(
+              'Eliminar',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      setState(() => _service.deleteProject(id));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Proyecto eliminado correctamente')),
+        );
+      }
+    }
+  }
+
+  // --- Formulario para crear o editar ---
+  void _openForm({ProjectModel? project}) {
+    showDialog(
+      context: context,
+      builder: (_) => ProjectForm(
+        project: project,
+        onSubmit: project == null ? _addProject : _editProject,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-  
-    final filteredProjects = _projects
-        .where((project) =>
-            project.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            project.status.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            project.participants.toLowerCase().contains(_searchQuery.toLowerCase()))
+    final filteredProjects = _service
+        .getAllProjects()
+        .where((p) =>
+            p.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            p.owner.toLowerCase().contains(_searchQuery.toLowerCase()))
         .toList();
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _openForm(),
+        label: const Text('Nuevo Proyecto'),
+        icon: const Icon(Icons.add),
+        backgroundColor: colors.primary,
+        foregroundColor: colors.onPrimary,
+      ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-          ),
+          const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: TextField(
               decoration: InputDecoration(
-                hintText: "Buscar usuario...",
+                hintText: "Buscar proyecto...",
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: colors.surfaceContainerHighest,
@@ -79,28 +116,98 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   borderSide: BorderSide.none,
                 ),
               ),
-              onChanged: (value) {
-                setState(() => _searchQuery = value);
-              },
+              onChanged: (value) => setState(() => _searchQuery = value),
             ),
           ),
-          
-          // List of filtered projects
+          const SizedBox(height: 12),
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(12),
-              itemCount: filteredProjects.length, // Use the filtered list count
-              separatorBuilder: (_, __) => const SizedBox(height: 16),
-              itemBuilder: (context, index) {
-                final project = filteredProjects[index]; // Use the filtered list
-                return ProjectCard(
-                  imageUrl: project.imageUrl,
-                  projectName: project.name,
-                  projectStatus: project.status,
-                  participants: project.participants,
-                );
-              },
-            ),
+            child: filteredProjects.isEmpty
+                ? const Center(child: Text('No hay proyectos registrados'))
+                : ListView.separated(
+                    padding: const EdgeInsets.all(12),
+                    itemCount: filteredProjects.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 16),
+                    itemBuilder: (context, index) {
+                      final project = filteredProjects[index];
+                      return Stack(
+                        children: [
+                          // --- Tarjeta del proyecto ---
+                          ProjectCard(
+                            imageUrl: 'https://picsum.photos/400?random=$index',
+                            projectName: project.name,
+                            projectStatus: project.status,
+                            participants: 'Responsable: ${project.owner}',
+                            onTap: () async {
+                              if (!mounted) return;
+                              await showDialog(
+                                context: context,
+                                builder: (dialogContext) => AlertDialog(
+                                  title: Text(project.name),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(project.description),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                          "Estado: ${project.status} | Fecha: ${project.date}"),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(dialogContext).pop();
+                                      },
+                                      child: const Text('Cerrar'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+
+                          // --- Menú flotante (Editar / Eliminar) ---
+                          Positioned(
+                            top: 12,
+                            right: 12,
+                            child: PopupMenuButton<String>(
+                              icon: const Icon(Icons.more_vert),
+                              onSelected: (value) {
+                                if (value == 'edit') {
+                                  _openForm(project: project);
+                                } else if (value == 'delete') {
+                                  _deleteProject(project.id);
+                                }
+                              },
+                              itemBuilder: (context) => [
+                                const PopupMenuItem(
+                                  value: 'edit',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.edit, color: Colors.blue),
+                                      SizedBox(width: 8),
+                                      Text('Editar'),
+                                    ],
+                                  ),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'delete',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.delete, color: Colors.red),
+                                      SizedBox(width: 8),
+                                      Text('Eliminar'),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
           ),
         ],
       ),

@@ -6,6 +6,8 @@ class ProjectCard extends StatefulWidget {
   final String projectStatus;
   final String participants;
   final VoidCallback? onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const ProjectCard({
     super.key,
@@ -14,6 +16,8 @@ class ProjectCard extends StatefulWidget {
     required this.projectStatus,
     required this.participants,
     this.onTap,
+    this.onEdit,
+    this.onDelete,
   });
 
   @override
@@ -27,7 +31,7 @@ class _ProjectCardState extends State<ProjectCard> {
   void _onTapDown(TapDownDetails details) {
     setState(() {
       _scale = 0.97;
-      _elevation = 8.0; // aumenta sombra al presionar
+      _elevation = 8.0;
     });
   }
 
@@ -71,70 +75,114 @@ class _ProjectCardState extends State<ProjectCard> {
             ),
             elevation: _elevation,
             clipBehavior: Clip.antiAlias,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
               children: [
-                // Imagen con placeholder y fallback
-                SizedBox(
-                  height: 150,
-                  width: double.infinity,
-                  child: FadeInImage.assetNetwork(
-                    placeholder: 'assets/placeholder.png',
-                    image: widget.imageUrl,
-                    fit: BoxFit.cover,
-                    imageErrorBuilder: (context, error, stackTrace) =>
-                        Center(
+                // --- Contenido principal de la tarjeta ---
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 150,
+                      width: double.infinity,
+                      child: FadeInImage.assetNetwork(
+                        placeholder: 'assets/placeholder.png',
+                        image: widget.imageUrl,
+                        fit: BoxFit.cover,
+                        imageErrorBuilder: (context, error, stackTrace) => Center(
                           child: Icon(
                             Icons.broken_image,
                             size: 50,
                             color: colors.error,
                           ),
                         ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Nombre del proyecto
-                      Text(
-                        widget.projectName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.titleMedium?.copyWith(
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.projectName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: colors.onSurface,
                             ),
-                      ),
-                      const SizedBox(height: 4),
-                      // Estado del proyecto
-                      Text(
-                        "Estado: ${widget.projectStatus}",
-                        style: textTheme.bodyMedium?.copyWith(
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Estado: ${widget.projectStatus}",
+                            style: textTheme.bodyMedium?.copyWith(
                               color: colors.onSurfaceVariant,
                             ),
-                      ),
-                      const SizedBox(height: 8),
-                      // Participantes
-                      Row(
-                        children: [
-                          Icon(Icons.people,
-                              size: 20, color: colors.onSurfaceVariant),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              widget.participants,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: textTheme.bodyMedium?.copyWith(
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(Icons.people,
+                                  size: 20, color: colors.onSurfaceVariant),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  widget.participants,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: textTheme.bodyMedium?.copyWith(
                                     color: colors.onSurface,
                                   ),
-                            ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+
+                // Menú de tres puntos arriba a la derecha 
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Material(
+                    color: Colors.white, // Fondo blanco real
+                    elevation: 3, // Le da relieve sobre la imagen
+                    shape: const CircleBorder(),
+                    child: PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert, color: Colors.black87),
+                      color: Colors.white, // Fondo del menú
+                      onSelected: (value) {
+                        if (value == 'edit' && widget.onEdit != null) {
+                          widget.onEdit!();
+                        } else if (value == 'delete' && widget.onDelete != null) {
+                          widget.onDelete!();
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        const PopupMenuItem(
+                          value: 'edit',
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit, color: Colors.blue),
+                              SizedBox(width: 8),
+                              Text('Editar'),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete, color: Colors.red),
+                              SizedBox(width: 8),
+                              Text('Eliminar'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

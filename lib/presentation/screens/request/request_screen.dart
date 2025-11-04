@@ -9,10 +9,15 @@ class RequestScreen extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-  
-    final String projectName = "Diseño de Prototipo de Robot";
-    final String date = "21 de septiembre de 2025";
-    final String description =
+    // ✅ Recibir datos (si vienen desde RequestListScreen)
+    final extra = GoRouterState.of(context).extra as Map<String, dynamic>?;
+
+    // ✅ Si no vienen datos, usa valores por defecto
+    final String projectName =
+        extra?['project'] ?? "Diseño de Prototipo de Robot";
+    final String date =
+        extra?['date'] ?? "21 de septiembre de 2025";
+    final String description = extra?['description'] ??
         "Solicitud para el uso de equipos de impresión 3D y láser para la creación del prototipo de robot. Se requiere acceso al software de diseño para la fase de modelado.";
 
     return Scaffold(
@@ -30,8 +35,14 @@ class RequestScreen extends StatelessWidget {
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: colors.onPrimary),
-          
-          onPressed: () => context.go('/main_home'),
+          // 👇 Si hay historial, vuelve atrás; si no, va al listado
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/requests');
+            }
+          },
         ),
       ),
       body: Padding(
@@ -47,7 +58,6 @@ class RequestScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                //  Nombre del proyecto 
                 Text(
                   projectName,
                   style: textTheme.headlineSmall?.copyWith(
@@ -56,8 +66,6 @@ class RequestScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-
-                // Fecha
                 Text(
                   "Fecha: $date",
                   style: textTheme.bodyMedium?.copyWith(
@@ -65,8 +73,6 @@ class RequestScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                //  Descripción 
                 Text(
                   description,
                   style: textTheme.bodyLarge?.copyWith(
@@ -74,9 +80,7 @@ class RequestScreen extends StatelessWidget {
                     height: 1.4,
                   ),
                 ),
-                const SizedBox(height: 30),
-
-                //  Botones de acción 
+                const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
