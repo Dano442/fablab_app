@@ -56,7 +56,6 @@ class _UserFormState extends State<UserForm> {
               _buildField(_career, 'Carrera'),
               _buildField(_role, 'Rol'),
               _buildField(_project, 'Proyecto'),
-              _buildField(_imageUrl, 'URL de Imagen (opcional)', isRequired: false),
             ],
           ),
         ),
@@ -64,7 +63,9 @@ class _UserFormState extends State<UserForm> {
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
         ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: colors.primary),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: colors.primary,
+            foregroundColor: Colors.white),
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               final user = UserModel(

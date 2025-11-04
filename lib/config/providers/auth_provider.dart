@@ -1,4 +1,4 @@
-import 'package:fablab_app/data/services/auth_services.dart';
+import 'package:fablab_app/data/services/auth_service.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:fablab_app/domain/models/user_model.dart';
 

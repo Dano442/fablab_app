@@ -1,4 +1,4 @@
-import 'package:fablab_app/data/services/auth_services.dart';
+import 'package:fablab_app/data/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
