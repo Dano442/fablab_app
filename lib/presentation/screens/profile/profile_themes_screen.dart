@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:fablab_app/config/theme/app_theme.dart';
-import 'package:fablab_app/main.dart'; // 👈 para acceder a MainApp.of(context)
+import 'package:fablab_app/main.dart'; // acceder a MainApp.of(context)
 
 class ProfileThemesScreen extends StatelessWidget {
   const ProfileThemesScreen({super.key});
@@ -25,7 +25,7 @@ class ProfileThemesScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
               'Selecciona un color para el tema:',

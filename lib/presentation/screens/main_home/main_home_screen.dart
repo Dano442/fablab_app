@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,7 +24,6 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   }
 
   Future<void> _loadDashboardData() async {
-    // Simulación temporal hasta conectar con API real
     await Future.delayed(const Duration(seconds: 1));
 
     setState(() {
@@ -73,66 +74,72 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
     return Scaffold(
       backgroundColor: colors.surface,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView( 
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Panel Administrativo',
-                        style: textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colors.onSurface,
+                      //  Cabecera
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 20, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: colors.primaryContainer,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Panel Administrativo',
+                              style: textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colors.onPrimaryContainer,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Monitorea tus métricas clave en tiempo real',
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: colors.onPrimaryContainer.withOpacity(0.8),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 24),
 
-                      // Indicador de carga
-                      if (isLoading)
-                        const Padding(
-                          padding: EdgeInsets.only(top: 80),
-                          child: Center(child: CircularProgressIndicator()),
-                        )
-                      else
-                        GridView.builder(
-                          physics:
-                              const NeverScrollableScrollPhysics(), // evita doble scroll
-                          shrinkWrap: true, // ajusta el tamaño
-                          itemCount: dashboardData.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                            childAspectRatio: 1.1,
-                          ),
-                          itemBuilder: (context, index) {
-                            final item = dashboardData[index];
-                            return _DashboardCard(
-                              title: item['title'] as String,
-                              value: item['value'] as String,
-                              icon: item['icon'] as IconData,
-                              color: item['color'] as Color,
-                              onTap: () =>
-                                  context.go(item['route'] as String),
-                            );
-                          },
+                      //  Grid de métricas
+                      GridView.builder(
+                        physics:
+                            const NeverScrollableScrollPhysics(), //  Evita doble scroll
+                        shrinkWrap: true, //  Permite que el grid se adapte al tamaño
+                        itemCount: dashboardData.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 1.1,
                         ),
-
-                      const SizedBox(height: 24),
+                        itemBuilder: (context, index) {
+                          final item = dashboardData[index];
+                          return _DashboardCard(
+                            title: item['title'] as String,
+                            value: item['value'] as String,
+                            icon: item['icon'] as IconData,
+                            color: item['color'] as Color,
+                            onTap: () => context.go(item['route'] as String),
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),
-              ),
-            );
-          },
         ),
       ),
     );
@@ -165,9 +172,7 @@ class _DashboardCard extends StatelessWidget {
       splashColor: color.withOpacity(0.3),
       child: Card(
         elevation: 6,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         color: colors.surfaceContainerHighest,
         child: Padding(
           padding: const EdgeInsets.all(16),

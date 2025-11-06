@@ -1,16 +1,214 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class ProfileDetailsScreen extends StatelessWidget {
+class ProfileDetailsScreen extends StatefulWidget {
   const ProfileDetailsScreen({super.key});
 
   @override
+  State<ProfileDetailsScreen> createState() => _ProfileDetailsScreenState();
+}
+
+class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
+  bool _isEditing = false;
+
+  // Datos simulados (se reemplazarán por los del backend)
+  String _name = 'Daniel Ronceros';
+  String _email = 'daniel.ronceros@fablab.cl';
+  String _role = 'Administrador';
+  String _career = 'Ingeniería en Informática';
+
+  final _formKey = GlobalKey<FormState>();
+
+  late final TextEditingController _nameController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _careerController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: _name);
+    _emailController = TextEditingController(text: _email);
+    _careerController = TextEditingController(text: _career);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _careerController.dispose();
+    super.dispose();
+  }
+
+  void _toggleEdit() => setState(() => _isEditing = !_isEditing);
+
+  void _saveProfile() {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _name = _nameController.text;
+        _email = _emailController.text;
+        _career = _careerController.text;
+        _isEditing = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('✅ Cambios guardados correctamente')),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detalles del Perfil'),
+        title: const Text('Perfil de Usuario'),
+        backgroundColor: colors.primary,
+        foregroundColor: colors.onPrimary,
+        elevation: 2,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: colors.onPrimary),
+          onPressed: () => context.go('/profile'),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(_isEditing ? Icons.close : Icons.edit),
+            tooltip: _isEditing ? 'Cancelar edición' : 'Editar perfil',
+            onPressed: _toggleEdit,
+          ),
+        ],
       ),
-      body: const Center(
-        child: Text('Esta es la pantalla de detalles del perfil.'),
+      backgroundColor: colors.surface,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            //  Tarjeta de resumen del perfil
+            Card(
+              elevation: 6,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              color: colors.surfaceContainerHighest,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: colors.primaryContainer,
+                      backgroundImage:
+                          const NetworkImage('https://picsum.photos/200'),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _name,
+                            style: textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colors.onSurface,
+                            ),
+                          ),
+                          Text(
+                            _email,
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: colors.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: colors.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              _role,
+                              style: TextStyle(
+                                color: colors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // ✏️ Formulario editable
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _nameController,
+                    enabled: _isEditing,
+                    decoration: const InputDecoration(
+                      labelText: 'Nombre completo',
+                      prefixIcon: Icon(Icons.person),
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) =>
+                        value == null || value.isEmpty ? 'Ingrese su nombre' : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _emailController,
+                    enabled: _isEditing,
+                    decoration: const InputDecoration(
+                      labelText: 'Correo electrónico',
+                      prefixIcon: Icon(Icons.email),
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) =>
+                        value == null || value.isEmpty ? 'Ingrese su correo' : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _careerController,
+                    enabled: _isEditing,
+                    decoration: const InputDecoration(
+                      labelText: 'Carrera / Área',
+                      prefixIcon: Icon(Icons.school),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    initialValue: _role,
+                    enabled: false,
+                    decoration: const InputDecoration(
+                      labelText: 'Rol en el sistema',
+                      prefixIcon: Icon(Icons.badge),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  if (_isEditing)
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colors.primary,
+                        foregroundColor: colors.onPrimary,
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
+                      onPressed: _saveProfile,
+                      icon: const Icon(Icons.save),
+                      label: const Text('Guardar cambios'),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
