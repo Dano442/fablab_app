@@ -17,7 +17,7 @@ import 'package:fablab_app/presentation/screens/request/request_screen.dart';
 import 'package:fablab_app/presentation/screens/home/home_screen.dart';
 import 'package:fablab_app/presentation/screens/main_home/main_home_screen.dart';
 import 'package:fablab_app/presentation/screens/project/project_screen.dart';
-import 'package:fablab_app/presentation/screens/users/users_screen.dart';
+import 'package:fablab_app/presentation/screens/users/user_screen.dart';
 import 'package:fablab_app/presentation/screens/news/news_screen.dart';
 import 'package:fablab_app/presentation/screens/inventory/inventory_screen.dart';
 

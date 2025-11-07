@@ -14,24 +14,37 @@ class UserForm extends StatefulWidget {
 class _UserFormState extends State<UserForm> {
   final _formKey = GlobalKey<FormState>();
 
-  late TextEditingController _name;
-  late TextEditingController _email;
+  late TextEditingController _nombre;
+  late TextEditingController _apellido;
+  late TextEditingController _correo;
   late TextEditingController _rut;
-  late TextEditingController _career;
-  late TextEditingController _role;
-  late TextEditingController _project;
-  late TextEditingController _imageUrl;
+  late TextEditingController _carrera;
+  late TextEditingController _telefono;
+  late TextEditingController _rol;
 
   @override
   void initState() {
     super.initState();
-    _name = TextEditingController(text: widget.user?.name ?? '');
-    _email = TextEditingController(text: widget.user?.email ?? '');
+    _nombre = TextEditingController(text: widget.user?.nombre ?? '');
+    _apellido = TextEditingController(text: widget.user?.apellido ?? '');
+    _correo =
+        TextEditingController(text: widget.user?.correoInstitucional ?? '');
     _rut = TextEditingController(text: widget.user?.rut ?? '');
-    _career = TextEditingController(text: widget.user?.career ?? '');
-    _role = TextEditingController(text: widget.user?.role ?? '');
-    _project = TextEditingController(text: widget.user?.project ?? '');
-    _imageUrl = TextEditingController(text: widget.user?.imageUrl ?? '');
+    _carrera = TextEditingController(text: widget.user?.carrera ?? '');
+    _telefono = TextEditingController(text: widget.user?.telefono ?? '');
+    _rol = TextEditingController(text: widget.user?.tipoRol ?? '');
+  }
+
+  @override
+  void dispose() {
+    _nombre.dispose();
+    _apellido.dispose();
+    _correo.dispose();
+    _rut.dispose();
+    _carrera.dispose();
+    _telefono.dispose();
+    _rol.dispose();
+    super.dispose();
   }
 
   @override
@@ -50,36 +63,47 @@ class _UserFormState extends State<UserForm> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildField(_name, 'Nombre'),
-              _buildField(_email, 'Correo'),
+              _buildField(_nombre, 'Nombre'),
+              _buildField(_apellido, 'Apellido'),
+              _buildField(_correo, 'Correo institucional'),
               _buildField(_rut, 'RUT'),
-              _buildField(_career, 'Carrera'),
-              _buildField(_role, 'Rol'),
-              _buildField(_project, 'Proyecto'),
+              _buildField(_carrera, 'Carrera'),
+              _buildField(_telefono, 'Teléfono', isRequired: false),
+              _buildField(_rol, 'Rol', isRequired: false),
             ],
           ),
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: colors.primary,
-            foregroundColor: Colors.white),
+            foregroundColor: colors.onPrimary,
+          ),
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               final user = UserModel(
-                id: widget.user?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
-                name: _name.text.trim(),
-                email: _email.text.trim(),
+                id: widget.user?.id ?? 0,
+                nombre: _nombre.text.trim(),
+                apellido: _apellido.text.trim(),
                 rut: _rut.text.trim(),
-                career: _career.text.trim(),
-                role: _role.text.trim(),
-                project: _project.text.trim(),
-                imageUrl: _imageUrl.text.trim().isEmpty
-                    ? 'https://via.placeholder.com/150'
-                    : _imageUrl.text.trim(),
+                correoInstitucional: _correo.text.trim(),
+                carrera: _carrera.text.trim(),
+                telefono: _telefono.text.trim(),
+                laboratorioId: widget.user?.laboratorioId,
+                laboratorio: widget.user?.laboratorio,
+                rolId: widget.user?.rolId ?? 2,
+                tipoRol: _rol.text.trim().isNotEmpty
+                    ? _rol.text.trim()
+                    : (widget.user?.tipoRol ?? 'Miembro'),
+                descripcionRol:
+                    widget.user?.descripcionRol ?? 'Sin descripción',
               );
+
               widget.onSubmit(user);
               Navigator.pop(context);
             }
@@ -97,7 +121,9 @@ class _UserFormState extends State<UserForm> {
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(labelText: label),
-        validator: isRequired ? (v) => v!.isEmpty ? 'Ingrese $label' : null : null,
+        validator: isRequired
+            ? (v) => v == null || v.isEmpty ? 'Ingrese $label' : null
+            : null,
       ),
     );
   }

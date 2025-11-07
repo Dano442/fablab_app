@@ -1,39 +1,62 @@
+import 'package:dio/dio.dart';
+import 'package:fablab_app/data/services/api_client.dart';
 import 'package:fablab_app/domain/models/user_model.dart';
 
 class UserService {
-  final List<UserModel> _users = [
-    UserModel(
-      id: '1',
-      name: 'Daniel Ronceros',
-      email: 'daniel@inacapmail.cl',
-      rut: '20.345.678-9',
-      career: 'Ingeniería Informática',
-      role: 'Administrador',
-      project: 'Gestión FabLab',
-      imageUrl: 'https://i.pravatar.cc/150?img=3',
-    ),
-    UserModel(
-      id: '2',
-      name: 'Nicolas Escobar',
-      email: 'diego@inacapmail.cl',
-      rut: '19.876.543-2',
-      career: 'Automatización y Robótica',
-      role: 'Colaborador',
-      project: 'Impresión 3D Avanzada',
-      imageUrl: 'https://i.pravatar.cc/150?img=5',
-    ),
-  ];
+  final Dio _dio = ApiClient.createDio();
 
-  List<UserModel> getAllUsers() => List.unmodifiable(_users);
+  // 🔹 Obtener todos los usuarios desde el endpoint de Azure
+  Future<List<UserModel>> getAllUsers() async {
+    try {
+      final response = await _dio.get('/usuarios');
+      if (response.statusCode == 200) {
+        final data = response.data;
 
-  void addUser(UserModel user) => _users.add(user);
-
-  void updateUser(UserModel updatedUser) {
-    final index = _users.indexWhere((u) => u.id == updatedUser.id);
-    if (index != -1) _users[index] = updatedUser;
+        // Si la API devuelve una lista de usuarios
+        if (data is List) {
+          return data.map((e) => UserModel.fromJson(e)).toList();
+        } else {
+          return [];
+        }
+      } else {
+        throw Exception('Error al obtener usuarios (${response.statusCode})');
+      }
+    } catch (e) {
+      print('❌ Error al obtener usuarios: $e');
+      return [];
+    }
   }
 
-  void deleteUser(String id) {
-    _users.removeWhere((u) => u.id == id);
+  // 🔹 Agregar un usuario nuevo
+  Future<bool> addUser(UserModel user) async {
+    try {
+      await _dio.post('/usuarios', data: user.toJson());
+      return true;
+    } catch (e) {
+      print('❌ Error al agregar usuario: $e');
+      return false;
+    }
+  }
+
+  // 🔹 Actualizar usuario existente
+  Future<bool> updateUser(UserModel user) async {
+    try {
+      await _dio.put('/usuarios/${user.id}', data: user.toJson());
+      return true;
+    } catch (e) {
+      print('❌ Error al actualizar usuario: $e');
+      return false;
+    }
+  }
+
+  // 🔹 Eliminar usuario
+  Future<bool> deleteUser(String id) async {
+    try {
+      await _dio.delete('/usuarios/$id');
+      return true;
+    } catch (e) {
+      print('❌ Error al eliminar usuario: $e');
+      return false;
+    }
   }
 }

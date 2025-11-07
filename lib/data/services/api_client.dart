@@ -4,7 +4,7 @@ import 'package:fablab_app/data/storage/secure_storage.dart';
 class ApiClient {
   static Dio createDio() {
     final dio = Dio(BaseOptions(
-      baseUrl: 'https://tu-api.com/api', // cambiar cuando tenga el api real aaaaa
+      baseUrl: 'https://fablabwebapi20251104221404-crbeb0b9cafvhqg3.canadacentral-01.azurewebsites.net/api',
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       headers: {'Content-Type': 'application/json'},

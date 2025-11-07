@@ -15,8 +15,12 @@ class UserCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Card(
       elevation: 4,
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -25,33 +29,44 @@ class UserCard extends StatelessWidget {
         child: Column(
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Imagen de perfil o ícono genérico si no hay imagen
                 CircleAvatar(
-                  radius: 40,
-                  backgroundImage: NetworkImage(user.imageUrl),
+                  radius: 35,
+                  backgroundColor: colors.primaryContainer,
+                  backgroundImage: const NetworkImage(
+                    'https://i.pravatar.cc/150?img=5',
+                  ),
                 ),
                 const SizedBox(width: 16),
+
+                // Información del usuario
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        user.name,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                        user.nombreCompleto,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colors.onSurface,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text('RUT: ${user.rut}'),
-                      Text('Carrera: ${user.career}'),
-                      Text('Rol: ${user.role}'),
-                      Text('Proyecto: ${user.project}'),
+                      Text('Correo: ${user.correoInstitucional}'),
+                      Text('Teléfono: ${user.telefono}'),
+                      Text('Carrera: ${user.carrera}'),
+                      Text('Rol: ${user.tipoRol}'),
                     ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+
+            // Botones de acción
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
