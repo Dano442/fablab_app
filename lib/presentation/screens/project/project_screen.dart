@@ -15,7 +15,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
   final ProjectService _service = ProjectService();
   String _searchQuery = "";
 
-  // --- Agregar proyecto ---
+  
   void _addProject(ProjectModel project) {
     if (!mounted) return;
     setState(() => _service.addProject(project));
@@ -24,7 +24,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
     );
   }
 
-  // --- Editar proyecto ---
+
   void _editProject(ProjectModel project) {
     if (!mounted) return;
     setState(() => _service.updateProject(project));
@@ -33,7 +33,6 @@ class _ProjectScreenState extends State<ProjectScreen> {
     );
   }
 
-  // --- Eliminar proyecto (fix pantallazo negro) ---
   Future<void> _deleteProject(String id) async {
     if (!mounted) return;
 
@@ -70,7 +69,6 @@ class _ProjectScreenState extends State<ProjectScreen> {
     }
   }
 
-  // --- Formulario para crear o editar ---
   void _openForm({ProjectModel? project}) {
     showDialog(
       context: context,
@@ -131,7 +129,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                       final project = filteredProjects[index];
                       return Stack(
                         children: [
-                          // --- Tarjeta del proyecto ---
+                          // 
                           ProjectCard(
                             imageUrl: 'https://picsum.photos/400?random=$index',
                             projectName: project.name,
@@ -167,7 +165,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                             },
                           ),
 
-                          // --- Menú flotante (Editar / Eliminar) ---
+                          // 
                           Positioned(
                             top: 12,
                             right: 12,

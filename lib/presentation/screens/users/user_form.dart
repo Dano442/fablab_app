@@ -3,7 +3,7 @@ import 'package:fablab_app/domain/models/user_model.dart';
 
 class UserForm extends StatefulWidget {
   final UserModel? user;
-  final void Function(UserModel user) onSubmit;
+  final void Function(UserModel) onSubmit;
 
   const UserForm({super.key, this.user, required this.onSubmit});
 
@@ -16,60 +16,52 @@ class _UserFormState extends State<UserForm> {
 
   late TextEditingController _nombre;
   late TextEditingController _apellido;
-  late TextEditingController _correo;
   late TextEditingController _rut;
+  late TextEditingController _correo;
   late TextEditingController _carrera;
   late TextEditingController _telefono;
-  late TextEditingController _rol;
 
   @override
   void initState() {
     super.initState();
-    _nombre = TextEditingController(text: widget.user?.nombre ?? '');
-    _apellido = TextEditingController(text: widget.user?.apellido ?? '');
-    _correo =
-        TextEditingController(text: widget.user?.correoInstitucional ?? '');
-    _rut = TextEditingController(text: widget.user?.rut ?? '');
-    _carrera = TextEditingController(text: widget.user?.carrera ?? '');
-    _telefono = TextEditingController(text: widget.user?.telefono ?? '');
-    _rol = TextEditingController(text: widget.user?.tipoRol ?? '');
+
+    _nombre = TextEditingController(text: widget.user?.nombre ?? "");
+    _apellido = TextEditingController(text: widget.user?.apellido ?? "");
+    _rut = TextEditingController(text: widget.user?.rut ?? "");
+    _correo = TextEditingController(text: widget.user?.correoInstitucional ?? "");
+    _carrera = TextEditingController(text: widget.user?.carrera ?? "");
+    _telefono = TextEditingController(text: widget.user?.telefono ?? "");
   }
 
   @override
   void dispose() {
     _nombre.dispose();
     _apellido.dispose();
-    _correo.dispose();
     _rut.dispose();
+    _correo.dispose();
     _carrera.dispose();
     _telefono.dispose();
-    _rol.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     final isEditing = widget.user != null;
+    final colors = Theme.of(context).colorScheme;
 
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      title: Text(isEditing ? 'Editar Usuario' : 'Nuevo Usuario'),
+      title: Text(isEditing ? "Editar Usuario" : "Nuevo Usuario"),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
-              _buildField(_nombre, 'Nombre'),
-              _buildField(_apellido, 'Apellido'),
-              _buildField(_correo, 'Correo institucional'),
-              _buildField(_rut, 'RUT'),
-              _buildField(_carrera, 'Carrera'),
-              _buildField(_telefono, 'Teléfono', isRequired: false),
-              _buildField(_rol, 'Rol', isRequired: false),
+              _buildInput(_nombre, "Nombre"),
+              _buildInput(_apellido, "Apellido"),
+              _buildInput(_rut, "RUT"),
+              _buildInput(_correo, "Correo institucional"),
+              _buildInput(_carrera, "Carrera"),
+              _buildInput(_telefono, "Teléfono", isNumber: true),
             ],
           ),
         ),
@@ -77,53 +69,50 @@ class _UserFormState extends State<UserForm> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
+          child: const Text("Cancelar"),
         ),
         ElevatedButton(
+          onPressed: () {
+            if (!_formKey.currentState!.validate()) return;
+
+            final user = UserModel(
+              id: isEditing ? widget.user!.id : null,
+              nombre: _nombre.text.trim(),
+              apellido: _apellido.text.trim(),
+              rut: _rut.text.trim(),
+              correoInstitucional: _correo.text.trim(),
+              carrera: _carrera.text.trim(),
+              telefono: _telefono.text.trim(),
+              laboratorioId: widget.user?.laboratorioId,
+              laboratorio: widget.user?.laboratorio,
+              rolId: widget.user?.rolId ?? 2,
+              tipoRol: widget.user?.tipoRol ?? "Miembro",
+              descripcionRol: widget.user?.descripcionRol ?? "",
+            );
+
+            widget.onSubmit(user);
+            Navigator.pop(context);
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: colors.primary,
             foregroundColor: colors.onPrimary,
           ),
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              final user = UserModel(
-                id: widget.user?.id ?? 0,
-                nombre: _nombre.text.trim(),
-                apellido: _apellido.text.trim(),
-                rut: _rut.text.trim(),
-                correoInstitucional: _correo.text.trim(),
-                carrera: _carrera.text.trim(),
-                telefono: _telefono.text.trim(),
-                laboratorioId: widget.user?.laboratorioId,
-                laboratorio: widget.user?.laboratorio,
-                rolId: widget.user?.rolId ?? 2,
-                tipoRol: _rol.text.trim().isNotEmpty
-                    ? _rol.text.trim()
-                    : (widget.user?.tipoRol ?? 'Miembro'),
-                descripcionRol:
-                    widget.user?.descripcionRol ?? 'Sin descripción',
-              );
-
-              widget.onSubmit(user);
-              Navigator.pop(context);
-            }
-          },
-          child: Text(isEditing ? 'Guardar' : 'Agregar'),
-        ),
+          child: Text(isEditing ? "Guardar" : "Agregar"),
+        )
       ],
     );
   }
 
-  Widget _buildField(TextEditingController controller, String label,
-      {bool isRequired = true}) {
+  Widget _buildInput(TextEditingController c, String label,
+      {bool isNumber = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: TextFormField(
-        controller: controller,
+        controller: c,
+        keyboardType: isNumber ? TextInputType.phone : TextInputType.text,
         decoration: InputDecoration(labelText: label),
-        validator: isRequired
-            ? (v) => v == null || v.isEmpty ? 'Ingrese $label' : null
-            : null,
+        validator: (v) =>
+            v == null || v.isEmpty ? "Ingrese $label" : null,
       ),
     );
   }

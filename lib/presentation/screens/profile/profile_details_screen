@@ -83,7 +83,6 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            //  Tarjeta de resumen del perfil
             Card(
               elevation: 6,
               shape: RoundedRectangleBorder(

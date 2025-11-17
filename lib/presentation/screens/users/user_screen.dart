@@ -26,40 +26,45 @@ class _UsersScreenState extends State<UsersScreen> {
 
   Future<void> _loadUsers() async {
     setState(() => _loading = true);
-    final fetchedUsers = await _userService.getAllUsers();
+    final data = await _userService.getAllUsers();
     setState(() {
-      users = fetchedUsers;
+      users = data;
       _loading = false;
     });
   }
 
   Future<void> _addUser(UserModel user) async {
-    final success = await _userService.addUser(user);
-    if (success) {
-      _loadUsers();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✅ Usuario agregado exitosamente')),
-      );
+    final ok = await _userService.addUser(user);
+    if (ok) {
+      await _loadUsers();
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Usuario agregado")));
+      }
     }
   }
 
-  Future<void> _editUser(UserModel updatedUser) async {
-    final success = await _userService.updateUser(updatedUser);
-    if (success) {
-      _loadUsers();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✅ Usuario actualizado')),
-      );
+  Future<void> _editUser(UserModel user) async {
+    final ok = await _userService.updateUser(user);
+    if (ok) {
+      await _loadUsers();
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Usuario actualizado")));
+      }
     }
   }
 
   Future<void> _deleteUser(UserModel user) async {
-    final success = await _userService.deleteUser(user.id.toString());
-    if (success) {
-      _loadUsers();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('🗑️ Usuario eliminado')),
-      );
+    if (user.id == null) return;
+
+    final ok = await _userService.deleteUser(user.id!);
+    if (ok) {
+      await _loadUsers();
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Usuario eliminado")));
+      }
     }
   }
 
@@ -77,31 +82,31 @@ class _UsersScreenState extends State<UsersScreen> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    final filteredUsers = users.where((user) {
-      final query = _searchQuery.toLowerCase();
-      return user.nombre.toLowerCase().contains(query) ||
-          user.apellido.toLowerCase().contains(query) ||
-          user.correoInstitucional.toLowerCase().contains(query) ||
-          user.rut.toLowerCase().contains(query) ||
-          user.carrera.toLowerCase().contains(query) ||
-          user.tipoRol.toLowerCase().contains(query);
+    final filtered = users.where((u) {
+      final q = _searchQuery.toLowerCase();
+      return u.nombre.toLowerCase().contains(q) ||
+          u.apellido.toLowerCase().contains(q) ||
+          u.correoInstitucional.toLowerCase().contains(q) ||
+          u.rut.toLowerCase().contains(q) ||
+          u.carrera.toLowerCase().contains(q) ||
+          u.tipoRol.toLowerCase().contains(q);
     }).toList();
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openUserForm(),
-        label: const Text('Agregar Usuario'),
+        label: const Text("Agregar Usuario"),
         icon: const Icon(Icons.add),
         backgroundColor: colors.primary,
         foregroundColor: colors.onPrimary,
       ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: TextField(
+              onChanged: (v) => setState(() => _searchQuery = v),
               decoration: InputDecoration(
                 hintText: "Buscar usuario...",
                 prefixIcon: const Icon(Icons.search),
@@ -112,25 +117,23 @@ class _UsersScreenState extends State<UsersScreen> {
                   borderSide: BorderSide.none,
                 ),
               ),
-              onChanged: (value) => setState(() => _searchQuery = value),
             ),
           ),
           const SizedBox(height: 10),
-
           Expanded(
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
-                : filteredUsers.isEmpty
-                    ? const Center(child: Text('No hay usuarios registrados'))
+                : filtered.isEmpty
+                    ? const Center(child: Text("No hay usuarios registrados"))
                     : RefreshIndicator(
                         onRefresh: _loadUsers,
                         child: ListView.separated(
                           padding: const EdgeInsets.all(12),
-                          itemCount: filteredUsers.length,
+                          itemCount: filtered.length,
                           separatorBuilder: (_, __) =>
                               const SizedBox(height: 16),
-                          itemBuilder: (context, index) {
-                            final user = filteredUsers[index];
+                          itemBuilder: (_, index) {
+                            final user = filtered[index];
                             return UserCard(
                               user: user,
                               onEdit: () => _openUserForm(user: user),

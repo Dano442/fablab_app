@@ -1,8 +1,7 @@
-// lib/presentation/screens/profile/profile_themes_screen.dart
 
 import 'package:flutter/material.dart';
 import 'package:fablab_app/config/theme/app_theme.dart';
-import 'package:fablab_app/main.dart'; // acceder a MainApp.of(context)
+import 'package:fablab_app/main.dart'; // 
 
 class ProfileThemesScreen extends StatelessWidget {
   const ProfileThemesScreen({super.key});
@@ -19,7 +18,7 @@ class ProfileThemesScreen extends StatelessWidget {
         foregroundColor: colors.onPrimary,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: colors.onPrimary),
-          onPressed: () => Navigator.pop(context), // 🔙 volver atrás
+          onPressed: () => Navigator.pop(context), // 
         ),
       ),
       body: Padding(

@@ -3,7 +3,7 @@ class RequestModel {
   final String title;
   final String description;
   final String requester;
-  final String status; // Pendiente, Aprobada, Rechazada
+  final String status; 
   final DateTime date;
 
   RequestModel({

@@ -69,7 +69,6 @@ class NewsCard extends StatelessWidget {
               ],
             ),
 
-            // Menú flotante arriba a la derecha
             Positioned(
               top: 8,
               right: 8,

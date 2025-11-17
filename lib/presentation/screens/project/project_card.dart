@@ -77,7 +77,7 @@ class _ProjectCardState extends State<ProjectCard> {
             clipBehavior: Clip.antiAlias,
             child: Stack(
               children: [
-                // --- Contenido principal de la tarjeta ---
+                //
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -142,17 +142,17 @@ class _ProjectCardState extends State<ProjectCard> {
                   ],
                 ),
 
-                // Menú de tres puntos arriba a la derecha 
+                
                 Positioned(
                   top: 8,
                   right: 8,
                   child: Material(
-                    color: Colors.white, // Fondo blanco real
-                    elevation: 3, // Le da relieve sobre la imagen
+                    color: Colors.white, 
+                    elevation: 3, 
                     shape: const CircleBorder(),
                     child: PopupMenuButton<String>(
                       icon: const Icon(Icons.more_vert, color: Colors.black87),
-                      color: Colors.white, // Fondo del menú
+                      color: Colors.white,
                       onSelected: (value) {
                         if (value == 'edit' && widget.onEdit != null) {
                           widget.onEdit!();

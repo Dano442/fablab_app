@@ -116,8 +116,8 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
                       //  Grid de métricas
                       GridView.builder(
                         physics:
-                            const NeverScrollableScrollPhysics(), //  Evita doble scroll
-                        shrinkWrap: true, //  Permite que el grid se adapte al tamaño
+                            const NeverScrollableScrollPhysics(), 
+                        shrinkWrap: true,
                         itemCount: dashboardData.length,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(

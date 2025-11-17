@@ -5,7 +5,7 @@ import 'package:fablab_app/config/theme/app_theme.dart';
 import 'package:fablab_app/config/router/app_router.dart';
 
 void main() {
-  runApp(const ProviderScope(child: MainApp())); // 👈 Riverpod global
+  runApp(const ProviderScope(child: MainApp()));
 }
 
 class MainApp extends StatefulWidget {
@@ -28,7 +28,7 @@ class MainAppState extends State<MainApp> {
     _loadTheme();
   }
 
-  /// Carga el tema guardado en almacenamiento seguro
+
   Future<void> _loadTheme() async {
     final savedIndex = await _storage.read(key: 'themeIndex');
     if (savedIndex != null) {
@@ -53,7 +53,7 @@ class MainAppState extends State<MainApp> {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       theme: theme,
-      routerConfig: appRouter, // 👈 usa las rutas con Splash/Login/Home
+      routerConfig: appRouter,
     );
   }
 }

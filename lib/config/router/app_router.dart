@@ -21,19 +21,14 @@ import 'package:fablab_app/presentation/screens/users/user_screen.dart';
 import 'package:fablab_app/presentation/screens/news/news_screen.dart';
 import 'package:fablab_app/presentation/screens/inventory/inventory_screen.dart';
 
-/// Clave global para controlar la navegación raíz
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
-/// Rutas principales de la aplicación FabLab
 final appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
 
-  /// Ahora iniciamos en `/splash` para verificar si hay sesión activa
+ 
   initialLocation: '/splash',
-
   routes: [
-
-    //  Rutas de autenticación
     GoRoute(
       path: '/splash',
       builder: (context, state) => const SplashScreen(),
@@ -43,7 +38,6 @@ final appRouter = GoRouter(
       builder: (context, state) => const LoginScreen(),
     ),
 
-    // ---  Shell principal (con BottomNavigationBar) ---
     ShellRoute(
       builder: (context, state, child) => HomeScreen(child: child),
       routes: [
@@ -70,7 +64,6 @@ final appRouter = GoRouter(
       ],
     ),
 
-    // Rutas independientes
     GoRoute(
       path: '/profile',
       parentNavigatorKey: _rootNavigatorKey,

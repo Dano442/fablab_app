@@ -12,17 +12,16 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _loading = false;
   final AuthService _authService = AuthService();
+
+  bool _loading = false;
 
   Future<void> _login() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, completa todos los campos')),
-      );
+      _showSnack('Por favor, completa todos los campos');
       return;
     }
 
@@ -30,15 +29,31 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final success = await _authService.login(email, password);
 
+    if (!mounted) return;
+
     setState(() => _loading = false);
 
-    if (success && mounted) {
+    if (success) {
       context.go('/main_home');
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Credenciales incorrectas')),
-      );
+    } else {
+      _showSnack('Credenciales incorrectas');
     }
+  }
+
+  void _showSnack(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -64,6 +79,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 32),
+
+              // EMAIL
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
@@ -75,7 +92,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
+
               const SizedBox(height: 16),
+
+              // PASSWORD
               TextField(
                 controller: _passwordController,
                 obscureText: true,
@@ -87,7 +107,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
+
               const SizedBox(height: 32),
+
               SizedBox(
                 width: double.infinity,
                 height: 48,
@@ -101,7 +123,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   onPressed: _loading ? null : _login,
                   child: _loading
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
                       : const Text('Ingresar'),
                 ),
               ),

@@ -15,11 +15,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> _checkLoginStatus() async {
     final loggedIn = await _authService.isLoggedIn();
+
     if (loggedIn) {
-      final user = await _authService.getProfile();
+      // Por ahora NO tenemos getProfile(),
+      // así que dejamos user en null hasta que tu backend exponga un endpoint.
       state = state.copyWith(
         isAuthenticated: true,
-        user: user,
         status: AuthStatus.authenticated,
       );
     } else {
@@ -29,13 +30,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> login(String email, String password) async {
     state = state.copyWith(status: AuthStatus.loading);
+
     final success = await _authService.login(email, password);
 
     if (success) {
-      final user = await _authService.getProfile();
       state = state.copyWith(
         isAuthenticated: true,
-        user: user,
         status: AuthStatus.authenticated,
       );
     } else {
