@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fablab_app/domain/models/inventory_model.dart';
 import 'package:fablab_app/data/services/inventory_service.dart';
+import 'package:fablab_app/domain/models/inventory_model.dart';
 import 'package:fablab_app/presentation/screens/inventory/inventory_form.dart';
 
 class InventoryScreen extends StatefulWidget {
@@ -12,24 +12,72 @@ class InventoryScreen extends StatefulWidget {
 
 class _InventoryScreenState extends State<InventoryScreen> {
   final InventoryService _service = InventoryService();
-  String _searchQuery = "";
+  String calcularEstado(int stock) {
+    if(stock <= 0) return "No Disponible";
+    if (stock < 3) return "Bajo Stock";
+    if (stock < 10) return "Medio";
+    return "Disponible";
+  }
 
-  void _openForm({InventoryModel? item}) {
+  List<InventoryModel> _items = [];
+  String _searchQuery = "";
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInventory();
+  }
+
+  Future<void> _loadInventory() async {
+    setState(() => _isLoading = true);
+    final data = await _service.getInventory();
+    setState(() {
+      _items = data;
+      _isLoading = false;
+    });
+  }
+
+  void _showMessage(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _openCreateForm() {
+    showDialog(
+      context: context,
+      builder: (_) => InventoryForm(
+        onSubmit: (newItem) async {
+          await _service.createInventory(newItem);
+          await _loadInventory();
+          _showMessage("Ítem creado");
+        },
+      ),
+    );
+  }
+
+  void _openEditForm(InventoryModel item) {
     showDialog(
       context: context,
       builder: (_) => InventoryForm(
         item: item,
-        onSubmit: (newItem) {
-          setState(() {
-            if (item == null) {
-              _service.add(newItem);
-            } else {
-              _service.update(newItem);
-            }
-          });
+        onSubmit: (updatedItem) async {
+          await _service.updateInventory(item.id!, updatedItem);
+          await _loadInventory();
+          _showMessage("Ítem actualizado");
         },
       ),
     );
+  }
+
+  void _deleteItem(InventoryModel item) async {
+    await _service.deleteInventory(item.id!);
+    await _loadInventory();
+    _showMessage("Ítem eliminado");
   }
 
   @override
@@ -37,59 +85,51 @@ class _InventoryScreenState extends State<InventoryScreen> {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final items = _service.getAll();
-    final filtered = items
-        .where((i) =>
-            i.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            i.category.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            i.location.toLowerCase().contains(_searchQuery.toLowerCase()))
-        .toList();
+    final filtered = _items.where((item) {
+      final q = _searchQuery.toLowerCase();
+      return item.nombre.toLowerCase().contains(q) ||
+          item.categoria.toLowerCase().contains(q) ||
+          item.ubicacion.toLowerCase().contains(q);
+    }).toList();
 
-    // --- MÉTRICAS DEL DASHBOARD ---
-    final totalItems = items.length;
-    final lowStock = items.where((item) => item.quantity < 3).length;
-    final uniqueCategories =
-        items.map((item) => item.category).toSet().length;
+    final totalItems = _items.length;
+    final lowStock = _items.where((i) => i.stock < 3).length;
+    final sinStock = _items.where((i) => i.stock <= 0).length;
 
     return Scaffold(
       backgroundColor: colors.surface,
+
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- DASHBOARD KPI ---
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildDashboardCard(
-                    context,
                     icon: Icons.inventory_2,
                     label: "Total Ítems",
                     value: totalItems.toString(),
-                    color: colors.primary,
+                    color: Colors.green,
                   ),
                   _buildDashboardCard(
-                    context,
                     icon: Icons.warning_amber_rounded,
                     label: "Stock Bajo",
                     value: lowStock.toString(),
-                    color: colors.error,
+                    color: Colors.amber,
                   ),
                   _buildDashboardCard(
-                    context,
-                    icon: Icons.category,
-                    label: "Categorías",
-                    value: uniqueCategories.toString(),
-                    color: colors.tertiary,
+                    icon: Icons.block_flipped,
+                    label: "Sin Stock",
+                    value: sinStock.toString(),
+                    color: colors.error,
                   ),
                 ],
               ),
 
               const SizedBox(height: 16),
 
-              // --- BARRA DE BÚSQUEDA ---
               TextField(
                 decoration: InputDecoration(
                   hintText: "Buscar ítem...",
@@ -101,107 +141,120 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     borderSide: BorderSide.none,
                   ),
                 ),
-                onChanged: (value) => setState(() => _searchQuery = value),
+                onChanged: (v) => setState(() => _searchQuery = v),
               ),
 
               const SizedBox(height: 12),
 
-              // --- LISTA DE ITEMS ---
               Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  itemCount: filtered.length,
-                  separatorBuilder: (_, __) => const Divider(height: 12),
-                  itemBuilder: (context, index) {
-                    final item = filtered[index];
-                    final stockColor = item.quantity < 3
-                        ? colors.error
-                        : (item.quantity < 10
-                            ? colors.tertiary
-                            : colors.primary);
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    await _loadInventory();
+                    _showMessage("Inventario actualizado");
+                  },
+                  child: _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : ListView.separated(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 80),
+                          itemCount: filtered.length,
+                          separatorBuilder: (_, __) =>
+                              const Divider(height: 12),
+                          itemBuilder: (_, i) {
+                            final item = filtered[i];
+                            
 
-                    return Card(
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(12),
-                        leading: Icon(Icons.inventory_2_outlined,
-                            color: stockColor, size: 32),
-                        title: Text(
-                          item.name,
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("${item.category} • ${item.location}",
-                                style: textTheme.bodyMedium),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(Icons.bar_chart,
-                                    size: 16, color: Colors.grey),
-                                const SizedBox(width: 4),
-                                Text(
-                                  "Stock: ${item.quantity}",
-                                  style: TextStyle(
-                                    color: stockColor,
-                                    fontWeight: FontWeight.w600,
+                            final stockColor = item.stock < 3
+                                ? colors.error
+                                : item.stock < 10
+                                    ? colors.tertiary
+                                    : colors.primary;
+
+                            return Card(
+                              elevation: 3,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.all(12),
+                                leading: Icon(
+                                  Icons.inventory_2_outlined,
+                                  color: stockColor,
+                                  size: 32,
+                                ),
+                                title: Text(
+                                  item.nombre,
+                                  style: textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        trailing: PopupMenuButton<String>(
-                          icon: const Icon(Icons.more_vert, color: Colors.black),
-                          onSelected: (value) {
-                            if (value == 'edit') {
-                              _openForm(item: item);
-                            } else if (value == 'delete') {
-                              setState(() => _service.delete(item.id));
-                            }
+                                subtitle: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    Text("${item.categoria} • ${item.ubicacion}"),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.bar_chart,
+                                            size: 16, color: Colors.grey),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          "Stock: ${item.stock}",
+                                          style: TextStyle(
+                                            color: stockColor,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+
+                                trailing: PopupMenuButton(
+                                  onSelected: (value) {
+                                    if (value == 'edit') {
+                                      _openEditForm(item);
+                                    } else if (value == 'delete') {
+                                      _deleteItem(item);
+                                    }
+                                  },
+                                  itemBuilder: (_) => const [
+                                    PopupMenuItem(
+                                      value: 'edit',
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.edit, size: 18),
+                                          SizedBox(width: 8),
+                                          Text("Editar"),
+                                        ],
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 'delete',
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.delete, size: 18),
+                                          SizedBox(width: 8),
+                                          Text("Eliminar"),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
                           },
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'edit',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.edit, color: Colors.blue),
-                                  SizedBox(width: 8),
-                                  Text('Editar'),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'delete',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.delete, color: Colors.red),
-                                  SizedBox(width: 8),
-                                  Text('Eliminar'),
-                                ],
-                              ),
-                            ),
-                          ],
                         ),
-                      ),
-                    );
-                  },
                 ),
-              ),
+              )
             ],
           ),
         ),
       ),
 
-      // --- BOTÓN FLOTANTE ---
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openForm(),
+        onPressed: _openCreateForm,
         backgroundColor: colors.primary,
         icon: const Icon(Icons.add, color: Colors.white),
         label: const Text(
@@ -212,9 +265,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
-  // --- Tarjeta de Dashboard (KPI) ---
-  Widget _buildDashboardCard(
-    BuildContext context, {
+  Widget _buildDashboardCard({
     required IconData icon,
     required String label,
     required String value,
@@ -251,7 +302,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
             const SizedBox(height: 2),
             Text(
               label,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+              ),
             ),
           ],
         ),

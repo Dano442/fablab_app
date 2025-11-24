@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fablab_app/data/services/news_service.dart';
 import 'package:fablab_app/domain/models/news_model.dart';
 import 'package:fablab_app/presentation/screens/news/news_card.dart';
 import 'package:fablab_app/presentation/screens/news/news_form.dart';
-import 'package:fablab_app/data/services/news_service.dart';
 
 class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});
@@ -13,46 +13,34 @@ class NewsScreen extends StatefulWidget {
 
 class _NewsScreenState extends State<NewsScreen> {
   final NewsService _service = NewsService();
-  String _searchQuery = "";
 
-  void _addNews(NewsModel news) {
-    setState(() => _service.addNews(news));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Noticia agregada')),
-    );
+  List<NewsModel> _news = [];
+  String _search = "";
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNews();
   }
 
-  void _editNews(NewsModel news) {
-    setState(() => _service.updateNews(news));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Noticia actualizada')),
-    );
-  }
+  Future<void> _loadNews() async {
+    setState(() => _loading = true);
 
-  Future<void> _deleteNews(String id) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Eliminar Noticia'),
-        content: const Text('¿Estás seguro de que deseas eliminar esta noticia?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
+    final fetched = await _service.getAllNews();
 
-    if (confirmed == true && mounted) {
-      setState(() => _service.deleteNews(id));
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Noticia eliminada correctamente')),
-      );
+    // Ordenar por fecha DESC
+    fetched.sort((a, b) {
+      final fa = a.fechaPublicacion ?? DateTime(1990);
+      final fb = b.fechaPublicacion ?? DateTime(1990);
+      return fb.compareTo(fa);
+    });
+
+    if (mounted) {
+      setState(() {
+        _news = fetched;
+        _loading = false;
+      });
     }
   }
 
@@ -61,26 +49,82 @@ class _NewsScreenState extends State<NewsScreen> {
       context: context,
       builder: (_) => NewsForm(
         news: news,
-        onSubmit: news == null ? _addNews : _editNews,
+        onSubmit: (noticia) async {
+          bool ok;
+
+          if (news == null) {
+            // CREAR
+            ok = await _service.createNews(noticia);
+            if (ok) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Noticia creada")),
+              );
+            }
+          } else {
+            // EDITAR
+            ok = await _service.updateNews(noticia);
+            if (ok) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Noticia actualizada")),
+              );
+            }
+          }
+
+          await _loadNews();
+        },
       ),
     );
+  }
+
+  Future<void> _deleteNews(int id) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text("Eliminar noticia"),
+        content: const Text("¿Deseas eliminar esta noticia?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text("Cancelar"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text(
+              "Eliminar",
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final ok = await _service.deleteNews(id);
+      if (ok) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Noticia eliminada")),
+        );
+        await _loadNews();
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    final filteredNews = _service
-        .getAllNews()
-        .where((n) =>
-            n.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            n.content.toLowerCase().contains(_searchQuery.toLowerCase()))
-        .toList();
+    final filtered = _news.where((n) {
+      final q = _search.toLowerCase();
+      return n.titulo.toLowerCase().contains(q) ||
+          n.epigrafe.toLowerCase().contains(q) ||
+          n.contenido.toLowerCase().contains(q) ||
+          n.autor.toLowerCase().contains(q);
+    }).toList();
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openForm(),
-        label: const Text('Nueva Noticia'),
+        onPressed: () => _openForm(news: null),
+        label: const Text("Nueva noticia"),
         icon: const Icon(Icons.add),
         backgroundColor: colors.primary,
         foregroundColor: colors.onPrimary,
@@ -88,6 +132,7 @@ class _NewsScreenState extends State<NewsScreen> {
       body: Column(
         children: [
           const SizedBox(height: 12),
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: TextField(
@@ -101,42 +146,50 @@ class _NewsScreenState extends State<NewsScreen> {
                   borderSide: BorderSide.none,
                 ),
               ),
-              onChanged: (value) => setState(() => _searchQuery = value),
+              onChanged: (v) => setState(() => _search = v),
             ),
           ),
+
           const SizedBox(height: 12),
+
           Expanded(
-            child: filteredNews.isEmpty
-                ? const Center(child: Text('No hay noticias disponibles'))
-                : ListView.separated(
-                    padding: const EdgeInsets.all(12),
-                    itemCount: filteredNews.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 16),
-                    itemBuilder: (context, index) {
-                      final news = filteredNews[index];
-                      return NewsCard(
-                        news: news,
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (dialogContext) => AlertDialog(
-                              title: Text(news.title),
-                              content: Text(news.content),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(dialogContext).pop(),
-                                  child: const Text('Cerrar'),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                        onEdit: () => _openForm(news: news),
-                        onDelete: () => _deleteNews(news.id),
-                      );
-                    },
-                  ),
+            child: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : filtered.isEmpty
+                    ? const Center(child: Text("No hay noticias disponibles"))
+                    : RefreshIndicator(
+                        onRefresh: _loadNews,
+                        child: ListView.separated(
+                          padding: const EdgeInsets.all(12),
+                          itemCount: filtered.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 16),
+                          itemBuilder: (_, index) {
+                            final item = filtered[index];
+                            return NewsCard(
+                              news: item,
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (dialogContext) => AlertDialog(
+                                    title: Text(item.titulo),
+                                    content: Text(item.contenido),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(dialogContext).pop(),
+                                        child: const Text("Cerrar"),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              onEdit: () => _openForm(news: item),
+                              onDelete: () => _deleteNews(item.id!),
+                            );
+                          },
+                        ),
+                      ),
           ),
         ],
       ),

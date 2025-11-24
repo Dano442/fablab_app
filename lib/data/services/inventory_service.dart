@@ -1,31 +1,48 @@
+import 'package:dio/dio.dart';
+import 'package:fablab_app/data/services/api_client.dart';
 import 'package:fablab_app/domain/models/inventory_model.dart';
 
 class InventoryService {
-  final List<InventoryModel> _items = [
-    InventoryModel(
-      id: '1',
-      name: 'Impresora 3D Prusa',
-      category: 'Impresoras',
-      quantity: 2,
-      location: 'Taller Principal',
-    ),
-    InventoryModel(
-      id: '2',
-      name: 'Cortadora Láser',
-      category: 'Corte',
-      quantity: 1,
-      location: 'Área de Fabricación',
-    ),
-  ];
+  final Dio _dio = ApiClient.createDio();
 
-  List<InventoryModel> getAll() => List.from(_items);
-
-  void add(InventoryModel item) => _items.add(item);
-
-  void update(InventoryModel updated) {
-    final index = _items.indexWhere((i) => i.id == updated.id);
-    if (index != -1) _items[index] = updated;
+  Future<List<InventoryModel>> getInventory() async {
+    try {
+      final response = await _dio.get('/inventario');
+      final data = response.data as List;
+      return data.map((e) => InventoryModel.fromJson(e)).toList();
+    } catch (e) {
+      print("Error GET inventario: $e");
+      return [];
+    }
   }
 
-  void delete(String id) => _items.removeWhere((i) => i.id == id);
+  Future<bool> createInventory(InventoryModel item) async {
+    try {
+      await _dio.post('/inventario', data: item.toJsonPost());
+      return true;
+    } catch (e) {
+      print("Error POST inventario: $e");
+      return false;
+    }
+  }
+
+  Future<bool> updateInventory(int id, InventoryModel item) async {
+    try {
+      await _dio.put('/inventario/$id', data: item.toJsonPut());
+      return true;
+    } catch (e) {
+      print("Error PUT inventario: $e");
+      return false;
+    }
+  }
+
+  Future<bool> deleteInventory(int id) async {
+    try {
+      await _dio.delete('/inventario/$id');
+      return true;
+    } catch (e) {
+      print("Error DELETE inventario: $e");
+      return false;
+    }
+  }
 }

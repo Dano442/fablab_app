@@ -24,6 +24,23 @@ class UserService {
       return [];
     }
   }
+    Future<UserModel?> getUserById(int id) async {
+    try {
+      final response = await _dio.get('/usuarios/$id');
+
+      if (response.statusCode == 200) {
+        return UserModel.fromJson(response.data);
+      } else {
+        print('❌ Error al obtener usuario por ID (${response.statusCode})');
+        return null;
+      }
+
+    } catch (e) {
+      print('❌ Error getUserById: $e');
+      return null;
+    }
+  }
+
 
   Future<bool> addUser(UserModel user) async {
     try {

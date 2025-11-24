@@ -31,52 +31,97 @@ class NewsCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.network(
-                  news.imageUrl,
-                  height: 150,
+                Container(
+                  height: 180,
                   width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      const Icon(Icons.broken_image, size: 50),
+                  color: colors.surfaceContainerHighest,
+                  child: news.imageUrlPrincipal == null
+                      ? const Icon(Icons.image, size: 60)
+                      : Image.network(
+                          news.imageUrlPrincipal!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) =>
+                              const Icon(Icons.broken_image, size: 60),
+                        ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        news.title,
+                        news.titulo,
                         style: textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 4),
+                      if (news.epigrafe.trim().isNotEmpty)
+                        Text(
+                          news.epigrafe,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                      const SizedBox(height: 10),
                       Text(
-                        news.content,
+                        news.contenido,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: textTheme.bodyMedium,
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Publicado: ${news.date}',
-                        style: textTheme.labelSmall
-                            ?.copyWith(color: colors.onSurfaceVariant),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Icon(Icons.person, size: 16, color: colors.primary),
+                          const SizedBox(width: 6),
+                          Text(news.autor),
+                          const Spacer(),
+                          Icon(Icons.calendar_today,
+                              size: 16, color: colors.primary),
+                          const SizedBox(width: 6),
+                          Text(
+                            news.fechaPublicacion != null
+                                ? news.fechaPublicacion!
+                                    .toLocal()
+                                    .toString()
+                                    .substring(0, 10)
+                                : "Sin fecha",
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: news.estado == "Activo"
+                              ? colors.primary.withOpacity(0.15)
+                              : Colors.red.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          news.estado,
+                          style: TextStyle(
+                            color: news.estado == "Activo"
+                                ? colors.primary
+                                : Colors.red,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-
             Positioned(
               top: 8,
               right: 8,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
+              child: Material(
+                color: Colors.white,
+                shape: const CircleBorder(),
+                elevation: 3,
                 child: PopupMenuButton<String>(
                   icon: const Icon(Icons.more_vert),
                   onSelected: (value) {
@@ -90,7 +135,7 @@ class NewsCard extends StatelessWidget {
                         children: [
                           Icon(Icons.edit, color: Colors.blue),
                           SizedBox(width: 8),
-                          Text('Editar'),
+                          Text("Editar"),
                         ],
                       ),
                     ),
@@ -100,14 +145,14 @@ class NewsCard extends StatelessWidget {
                         children: [
                           Icon(Icons.delete, color: Colors.red),
                           SizedBox(width: 8),
-                          Text('Eliminar'),
+                          Text("Eliminar"),
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),

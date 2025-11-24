@@ -44,7 +44,6 @@ class ApiClient {
               await SecureStorage.saveToken(newToken);
               options.headers["Authorization"] = "Bearer $newToken";
             } else {
-              // Token válido
               options.headers["Authorization"] = "Bearer $token";
             }
           }

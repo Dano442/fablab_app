@@ -1,31 +1,51 @@
 class InventoryModel {
-  final String id;
-  final String name;
-  final String category;
-  final int quantity;
-  final String location;
+  final int? id;
+  final String nombre;
+  final String categoria;
+  final int stock;
+  final String ubicacion;
+  final String descripcion;
+  final String estado;
 
   InventoryModel({
-    required this.id,
-    required this.name,
-    required this.category,
-    required this.quantity,
-    required this.location,
+    this.id,
+    required this.nombre,
+    required this.categoria,
+    required this.stock,
+    required this.ubicacion,
+    required this.descripcion,
+    required this.estado,
   });
 
-  factory InventoryModel.fromJson(Map<String, dynamic> json) => InventoryModel(
-        id: json['id'].toString(),
-        name: json['name'] ?? '',
-        category: json['category'] ?? '',
-        quantity: json['quantity'] ?? 0,
-        location: json['location'] ?? '',
-      );
+  factory InventoryModel.fromJson(Map<String, dynamic> json) {
+    return InventoryModel(
+      id: json["id"],
+      nombre: json["nombre"],
+      categoria: json["categoria"],
+      stock: json["stock"],
+      ubicacion: json["ubicacion"],
+      descripcion: json["descripcion"],
+      estado: json["estado"],
+    );
+  }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'category': category,
-        'quantity': quantity,
-        'location': location,
-      };
+  Map<String, dynamic> toJsonPost() {
+    return {
+      "nombre": nombre,
+      "categoria": categoria,
+      "stock": stock,
+      "ubicacion": ubicacion,
+      "descripcion": descripcion ,
+      "estado": estado,
+    };
+  }
+
+  Map<String, dynamic> toJsonPut() {
+    return {
+      "nombre": nombre,
+      "categoria": categoria,
+      "stock": stock,
+      "ubicacion": ubicacion,
+    };
+  }
 }

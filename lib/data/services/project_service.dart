@@ -1,48 +1,116 @@
+import 'package:dio/dio.dart';
+import 'package:fablab_app/data/services/api_client.dart';
+import 'package:fablab_app/data/storage/secure_storage.dart';
 import 'package:fablab_app/domain/models/project_model.dart';
 
 class ProjectService {
-  final List<ProjectModel> _projects = [
-    ProjectModel(
-      id: '1',
-      name: 'Diseño de Prototipo de Robot',
-      description:
-          'Proyecto enfocado en la creación de un prototipo funcional de robot con sensores y movimiento automatizado.',
-      owner: 'Daniel Ronceros',
-      status: 'En progreso',
-      date: 'Octubre 2025',
-    ),
-    ProjectModel(
-      id: '2',
-      name: 'Sistema de Inventario Inteligente',
-      description:
-          'Desarrollo de una aplicación móvil y web para la gestión automatizada de inventario en el FabLab.',
-      owner: 'Alexis Pérez',
-      status: 'Completado',
-      date: 'Septiembre 2025',
-    ),
-    ProjectModel(
-      id: '3',
-      name: 'Impresión 3D Sostenible',
-      description:
-          'Investigación y uso de materiales reciclables en procesos de impresión 3D para reducir el impacto ambiental.',
-      owner: 'María José Gutiérrez',
-      status: 'Planificado',
-      date: 'Noviembre 2025',
-    ),
-  ];
+  final Dio _dio = ApiClient.createDio();
 
-  List<ProjectModel> getAllProjects() => _projects;
+  final String baseUrl = '/proyectos';
 
-  void addProject(ProjectModel project) {
-    _projects.add(project);
+  // GET ALL
+  Future<List<ProjectModel>> getAllProjects() async {
+    try {
+      final res = await _dio.get(baseUrl);
+
+      final List data = res.data;
+      return data.map((json) => ProjectModel.fromJson(json)).toList();
+    } catch (e) {
+      print("❌ Error cargando proyectos: $e");
+      return [];
+    }
   }
 
-  void updateProject(ProjectModel updated) {
-    final index = _projects.indexWhere((p) => p.id == updated.id);
-    if (index != -1) _projects[index] = updated;
+  // CREATE (POST)
+  Future<bool> createProject(ProjectModel project) async {
+    try {
+      final token = await SecureStorage.getToken();
+
+      print("=== TOKEN POST ===");
+      print(token);
+
+      final body = {
+        "titulo": project.titulo,
+        "categoria": project.categoria,
+        "descripcionProyecto": project.descripcionProyecto,
+        "areaAplicacion": project.areaAplicacion,
+        "imgUrl": project.imgUrl,
+        "fechaInicio": project.fechaInicio.toIso8601String(),
+        "usuarios": project.usuarios,
+        "hitoProyecto": project.hitoProyecto,
+      };
+
+      print("=== JSON ENVIADO AL POST ===");
+      print(body);
+
+      final response = await _dio.post(
+        baseUrl,
+        options: Options(
+          headers: {"Authorization": "Bearer $token"},
+        ),
+        data: body,
+      );
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      print("❌ Error en POST");
+      print(e);
+      return false;
+    }
   }
 
-  void deleteProject(String id) {
-    _projects.removeWhere((p) => p.id == id);
+  // UPDATE (PUT)
+  Future<bool> updateProject(ProjectModel project) async {
+    try {
+      final token = await SecureStorage.getToken();
+
+      final body = {
+        "id": project.id,
+        "titulo": project.titulo,
+        "categoria": project.categoria,
+        "descripcionProyecto": project.descripcionProyecto,
+        "areaAplicacion": project.areaAplicacion,
+        "imgUrl": project.imgUrl,
+        "fechaInicio": project.fechaInicio.toIso8601String(),
+        "usuarios": project.usuarios,
+        "hitoProyecto": project.hitoProyecto,
+      };
+
+      print("=== JSON ENVIADO AL PUT ===");
+      print(body);
+
+      final response = await _dio.put(
+        "$baseUrl/${project.id}",
+        options: Options(
+          headers: {"Authorization": "Bearer $token"},
+        ),
+        data: body,
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      print("❌ Error en PUT");
+      print(e);
+      return false;
+    }
+  }
+
+  // DELETE
+  Future<bool> deleteProject(int id) async {
+    try {
+      final token = await SecureStorage.getToken();
+
+      final res = await _dio.delete(
+        "$baseUrl/$id",
+        options: Options(
+          headers: {"Authorization": "Bearer $token"},
+        ),
+      );
+
+      return res.statusCode == 200;
+    } catch (e) {
+      print("❌ Error eliminando proyecto: $e");
+      return false;
+    }
   }
 }

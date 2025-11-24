@@ -54,7 +54,6 @@ class ToolCard extends StatelessWidget {
             ),
             const SizedBox(width: 16),
 
-            // Información
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,7 +81,6 @@ class ToolCard extends StatelessWidget {
               ),
             ),
 
-            // Acciones
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [

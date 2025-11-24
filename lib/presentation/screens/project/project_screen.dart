@@ -15,34 +15,57 @@ class _ProjectScreenState extends State<ProjectScreen> {
   final ProjectService _service = ProjectService();
   String _searchQuery = "";
 
-  
-  void _addProject(ProjectModel project) {
-    if (!mounted) return;
-    setState(() => _service.addProject(project));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Proyecto agregado')),
-    );
+  List<ProjectModel> _projects = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProjects();
   }
 
+  Future<void> _loadProjects() async {
+    setState(() => _loading = true);
 
-  void _editProject(ProjectModel project) {
+    final projects = await _service.getAllProjects();
     if (!mounted) return;
-    setState(() => _service.updateProject(project));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Proyecto actualizado')),
-    );
+
+    setState(() {
+      _projects = projects;
+      _loading = false;
+    });
   }
 
-  Future<void> _deleteProject(String id) async {
+  Future<void> _addProject(ProjectModel project) async {
+    final ok = await _service.createProject(project);
     if (!mounted) return;
 
+    if (ok) {
+      await _loadProjects();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Proyecto creado correctamente')),
+      );
+    }
+  }
+
+  Future<void> _editProject(ProjectModel project) async {
+    final ok = await _service.updateProject(project);
+    if (!mounted) return;
+
+    if (ok) {
+      await _loadProjects();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Proyecto actualizado')),
+      );
+    }
+  }
+
+  Future<void> _deleteProject(int id) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Eliminar Proyecto'),
-        content: const Text(
-          '¿Estás seguro de que deseas eliminar este proyecto?',
-        ),
+        content: const Text('¿Deseas eliminar este proyecto?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -50,20 +73,20 @@ class _ProjectScreenState extends State<ProjectScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text(
-              'Eliminar',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
     );
 
-    if (confirmed == true && mounted) {
-      setState(() => _service.deleteProject(id));
-      if (mounted) {
+    if (confirmed == true) {
+      final ok = await _service.deleteProject(id);
+      if (!mounted) return;
+
+      if (ok) {
+        await _loadProjects();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Proyecto eliminado correctamente')),
+          const SnackBar(content: Text('Proyecto eliminado')),
         );
       }
     }
@@ -83,12 +106,12 @@ class _ProjectScreenState extends State<ProjectScreen> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    final filteredProjects = _service
-        .getAllProjects()
-        .where((p) =>
-            p.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            p.owner.toLowerCase().contains(_searchQuery.toLowerCase()))
-        .toList();
+    final filteredProjects = _projects.where((p) {
+      final q = _searchQuery.toLowerCase();
+      return p.titulo.toLowerCase().contains(q) ||
+          p.categoria.toLowerCase().contains(q) ||
+          p.descripcionProyecto.toLowerCase().contains(q);
+    }).toList();
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
@@ -118,94 +141,105 @@ class _ProjectScreenState extends State<ProjectScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          Expanded(
-            child: filteredProjects.isEmpty
-                ? const Center(child: Text('No hay proyectos registrados'))
-                : ListView.separated(
-                    padding: const EdgeInsets.all(12),
-                    itemCount: filteredProjects.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 16),
-                    itemBuilder: (context, index) {
-                      final project = filteredProjects[index];
-                      return Stack(
-                        children: [
-                          // 
-                          ProjectCard(
-                            imageUrl: 'https://picsum.photos/400?random=$index',
-                            projectName: project.name,
-                            projectStatus: project.status,
-                            participants: 'Responsable: ${project.owner}',
-                            onTap: () async {
-                              if (!mounted) return;
-                              await showDialog(
-                                context: context,
-                                builder: (dialogContext) => AlertDialog(
-                                  title: Text(project.name),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(project.description),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                          "Estado: ${project.status} | Fecha: ${project.date}"),
-                                    ],
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(dialogContext).pop();
-                                      },
-                                      child: const Text('Cerrar'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
 
-                          // 
-                          Positioned(
-                            top: 12,
-                            right: 12,
-                            child: PopupMenuButton<String>(
-                              icon: const Icon(Icons.more_vert),
-                              onSelected: (value) {
-                                if (value == 'edit') {
-                                  _openForm(project: project);
-                                } else if (value == 'delete') {
-                                  _deleteProject(project.id);
-                                }
-                              },
-                              itemBuilder: (context) => [
-                                const PopupMenuItem(
-                                  value: 'edit',
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.edit, color: Colors.blue),
-                                      SizedBox(width: 8),
-                                      Text('Editar'),
-                                    ],
-                                  ),
+          Expanded(
+            child: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : filteredProjects.isEmpty
+                    ? const Center(child: Text('No hay proyectos registrados'))
+                    : RefreshIndicator(
+                        onRefresh: _loadProjects,
+                        child: ListView.separated(
+                          padding: const EdgeInsets.all(12),
+                          itemCount: filteredProjects.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 16),
+                          itemBuilder: (context, index) {
+                            final project = filteredProjects[index];
+
+                            return Stack(
+                              children: [
+                                ProjectCard(
+                                  imageUrl: (project.imgUrl ?? "").isNotEmpty
+                                      ? project.imgUrl
+                                      : "https://picsum.photos/400?random=$index",
+                                  projectName: project.titulo,
+                                  projectStatus: project.categoria,
+                                  participants:
+                                      'Área: ${project.areaAplicacion}',
+                                  onTap: () async {
+                                    await showDialog(
+                                      context: context,
+                                      builder: (dialogContext) => AlertDialog(
+                                        title: Text(project.titulo),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(project.descripcionProyecto),
+                                            const SizedBox(height: 12),
+                                            Text(
+                                              "Fecha inicio: ${project.fechaInicio.toString().split('T')[0]}",
+                                            ),
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(dialogContext)
+                                                    .pop(),
+                                            child: const Text('Cerrar'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
                                 ),
-                                const PopupMenuItem(
-                                  value: 'delete',
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.delete, color: Colors.red),
-                                      SizedBox(width: 8),
-                                      Text('Eliminar'),
+
+                                Positioned(
+                                  top: 12,
+                                  right: 12,
+                                  child: PopupMenuButton<String>(
+                                    icon: const Icon(Icons.more_vert),
+                                    onSelected: (value) {
+                                      if (value == 'edit') {
+                                        _openForm(project: project);
+                                      } else if (value == 'delete') {
+                                        _deleteProject(project.id);
+                                      }
+                                    },
+                                    itemBuilder: (context) => [
+                                      const PopupMenuItem(
+                                        value: 'edit',
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.edit,
+                                                color: Colors.blue),
+                                            SizedBox(width: 8),
+                                            Text('Editar'),
+                                          ],
+                                        ),
+                                      ),
+                                      const PopupMenuItem(
+                                        value: 'delete',
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.delete,
+                                                color: Colors.red),
+                                            SizedBox(width: 8),
+                                            Text('Eliminar'),
+                                          ],
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
                               ],
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+                            );
+                          },
+                        ),
+                      ),
           ),
         ],
       ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fablab_app/domain/models/project_model.dart';
-import 'package:uuid/uuid.dart';
 
 class ProjectForm extends StatefulWidget {
   final ProjectModel? project;
@@ -14,47 +13,65 @@ class ProjectForm extends StatefulWidget {
 
 class _ProjectFormState extends State<ProjectForm> {
   final _formKey = GlobalKey<FormState>();
-  final _uuid = const Uuid();
 
-  late TextEditingController _nameController;
-  late TextEditingController _descriptionController;
-  late TextEditingController _ownerController;
-  late TextEditingController _statusController;
-  late TextEditingController _dateController;
+  late TextEditingController _tituloController;
+  late TextEditingController _categoriaController;
+  late TextEditingController _descripcionController;
+  late TextEditingController _areaController;
+  late TextEditingController _imgUrlController;
+  late TextEditingController _fechaInicioController;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.project?.name ?? '');
-    _descriptionController =
-        TextEditingController(text: widget.project?.description ?? '');
-    _ownerController =
-        TextEditingController(text: widget.project?.owner ?? '');
-    _statusController =
-        TextEditingController(text: widget.project?.status ?? '');
-    _dateController =
-        TextEditingController(text: widget.project?.date ?? '');
+
+    _tituloController =
+        TextEditingController(text: widget.project?.titulo ?? '');
+
+    _categoriaController =
+        TextEditingController(text: widget.project?.categoria ?? '');
+
+    _descripcionController =
+        TextEditingController(text: widget.project?.descripcionProyecto ?? '');
+
+    _areaController =
+        TextEditingController(text: widget.project?.areaAplicacion ?? '');
+
+    _imgUrlController =
+        TextEditingController(text: widget.project?.imgUrl ?? '');
+
+    // Fecha: si edita, usa la del backend; si crea, usa la de hoy
+    final fecha = widget.project?.fechaInicio ?? DateTime.now();
+
+    _fechaInicioController =
+        TextEditingController(text: fecha.toIso8601String().split('T')[0]);
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _descriptionController.dispose();
-    _ownerController.dispose();
-    _statusController.dispose();
-    _dateController.dispose();
+    _tituloController.dispose();
+    _categoriaController.dispose();
+    _descripcionController.dispose();
+    _areaController.dispose();
+    _imgUrlController.dispose();
+    _fechaInicioController.dispose();
     super.dispose();
   }
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
+      final date = DateTime.parse(_fechaInicioController.text.trim());
+
       final newProject = ProjectModel(
-        id: widget.project?.id ?? _uuid.v4(),
-        name: _nameController.text.trim(),
-        description: _descriptionController.text.trim(),
-        owner: _ownerController.text.trim(),
-        status: _statusController.text.trim(),
-        date: _dateController.text.trim(),
+        id: widget.project?.id ?? 0,     // 0 cuando es nuevo
+        titulo: _tituloController.text.trim(),
+        categoria: _categoriaController.text.trim(),
+        descripcionProyecto: _descripcionController.text.trim(),
+        areaAplicacion: _areaController.text.trim(),
+        imgUrl: _imgUrlController.text.trim(),
+        fechaInicio: DateTime(date.year, date.month, date.day),
+        usuarios: widget.project?.usuarios ?? [],
+        hitoProyecto: widget.project?.hitoProyecto ?? [],
       );
 
       widget.onSubmit(newProject);
@@ -79,34 +96,51 @@ class _ProjectFormState extends State<ProjectForm> {
           child: Column(
             children: [
               TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Nombre'),
+                controller: _tituloController,
+                decoration: const InputDecoration(labelText: 'Título'),
                 validator: (value) =>
-                    value == null || value.isEmpty ? 'Ingrese un nombre' : null,
+                    value == null || value.isEmpty ? 'Ingrese un título' : null,
               ),
               const SizedBox(height: 12),
+
               TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Descripción'),
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Ingrese una descripción'
-                    : null,
+                controller: _categoriaController,
+                decoration: const InputDecoration(labelText: 'Categoría'),
               ),
               const SizedBox(height: 12),
+
               TextFormField(
-                controller: _ownerController,
+                controller: _descripcionController,
                 decoration:
-                    const InputDecoration(labelText: 'Responsable del proyecto'),
+                    const InputDecoration(labelText: 'Descripción del proyecto'),
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Ingrese una descripción' : null,
               ),
               const SizedBox(height: 12),
+
               TextFormField(
-                controller: _statusController,
-                decoration: const InputDecoration(labelText: 'Estado'),
+                controller: _areaController,
+                decoration: const InputDecoration(labelText: 'Área de aplicación'),
               ),
               const SizedBox(height: 12),
+
               TextFormField(
-                controller: _dateController,
-                decoration: const InputDecoration(labelText: 'Fecha'),
+                controller: _imgUrlController,
+                decoration:
+                    const InputDecoration(labelText: 'URL de imagen (opcional)'),
+              ),
+              const SizedBox(height: 12),
+
+              TextFormField(
+                controller: _fechaInicioController,
+                decoration:
+                    const InputDecoration(labelText: 'Fecha (YYYY-MM-DD)'),
+                validator: (v) {
+                  if (v == null || v.isEmpty) return 'Ingrese una fecha';
+                  final regex = RegExp(r'^\d{4}-\d{2}-\d{2}$');
+                  if (!regex.hasMatch(v)) return 'Formato incorrecto';
+                  return null;
+                },
               ),
             ],
           ),
@@ -123,7 +157,7 @@ class _ProjectFormState extends State<ProjectForm> {
             backgroundColor: colors.primary,
             foregroundColor: colors.onPrimary,
           ),
-          child: Text(isEditing ? 'Guardar cambios' : 'Crear'),
+          child: Text(isEditing ? 'Guardar' : 'Crear'),
         ),
       ],
     );

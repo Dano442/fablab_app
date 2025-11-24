@@ -6,7 +6,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 class AuthService {
   final Dio _dio = ApiClient.createDio();
 
-  /// LOGIN REAL
+  
   Future<bool> login(String email, String password) async {
     try {
       final response = await _dio.post(
@@ -30,12 +30,10 @@ class AuthService {
     }
   }
 
-  /// LOGOUT
   Future<void> logout() async {
     await SecureStorage.deleteToken();
   }
 
-  /// CHECK STATUS REAL
   Future<bool> checkStatus() async {
     try {
       final response =

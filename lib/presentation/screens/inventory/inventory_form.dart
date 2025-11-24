@@ -13,67 +13,100 @@ class InventoryForm extends StatefulWidget {
 
 class _InventoryFormState extends State<InventoryForm> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController nameController;
-  late TextEditingController categoryController;
-  late TextEditingController quantityController;
-  late TextEditingController locationController;
+
+  late TextEditingController nombre;
+  late TextEditingController categoria;
+  late TextEditingController stock;
+  late TextEditingController ubicacion;
+  late TextEditingController descripcion;
 
   @override
   void initState() {
     super.initState();
-    nameController = TextEditingController(text: widget.item?.name ?? '');
-    categoryController = TextEditingController(text: widget.item?.category ?? '');
-    quantityController = TextEditingController(text: widget.item?.quantity.toString() ?? '');
-    locationController = TextEditingController(text: widget.item?.location ?? '');
+    nombre = TextEditingController(text: widget.item?.nombre ?? "");
+    categoria = TextEditingController(text: widget.item?.categoria ?? "");
+    stock = TextEditingController(text: widget.item?.stock.toString() ?? "0");
+    ubicacion = TextEditingController(text: widget.item?.ubicacion ?? "");
+    descripcion = TextEditingController(text: widget.item?.descripcion ?? "");
+  }
+
+  String calcularEstado(int stock) {
+    if(stock <= 0) return "No Disponible";
+    if (stock < 3) return "Bajo Stock";
+    if (stock < 10) return "Medio";
+    return "Disponible";
   }
 
   void _save() {
     if (_formKey.currentState!.validate()) {
-      widget.onSubmit(InventoryModel(
-        id: widget.item?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
-        name: nameController.text.trim(),
-        category: categoryController.text.trim(),
-        quantity: int.tryParse(quantityController.text.trim()) ?? 0,
-        location: locationController.text.trim(),
-      ));
+      final int stockValue = int.parse(stock.text.trim());
+      final String estadoGenerado = calcularEstado(stockValue);
+
+      widget.onSubmit(
+        InventoryModel(
+          id: widget.item?.id,
+          nombre: nombre.text.trim(),
+          categoria: categoria.text.trim(),
+          stock: stockValue,
+          ubicacion: ubicacion.text.trim(),
+          descripcion: descripcion.text.trim(),
+          estado: estadoGenerado,
+        ),
+      );
+
       Navigator.pop(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isEdit = widget.item != null;
+
     return AlertDialog(
-      title: Text(widget.item == null ? 'Nuevo Ítem' : 'Editar Ítem'),
+      title: Text(isEdit ? "Editar Ítem" : "Nuevo Ítem"),
       content: Form(
         key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              TextFormField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: 'Nombre'),
-                validator: (v) => v!.isEmpty ? 'Ingrese un nombre' : null,
-              ),
-              TextFormField(
-                controller: categoryController,
-                decoration: const InputDecoration(labelText: 'Categoría'),
-              ),
-              TextFormField(
-                controller: quantityController,
-                decoration: const InputDecoration(labelText: 'Cantidad'),
-                keyboardType: TextInputType.number,
-              ),
-              TextFormField(
-                controller: locationController,
-                decoration: const InputDecoration(labelText: 'Ubicación'),
-              ),
-            ],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: nombre,
+              decoration: const InputDecoration(labelText: "Nombre"),
+              validator: (v) => v!.isEmpty ? "Requerido" : null,
+            ),
+            TextFormField(
+              controller: categoria,
+              decoration: const InputDecoration(labelText: "Categoría"),
+              validator: (v) => v!.isEmpty ? "Requerido" : null,
+            ),
+            TextFormField(
+              controller: stock,
+              decoration: const InputDecoration(labelText: "Stock"),
+              keyboardType: TextInputType.number,
+              validator: (v) => v!.isEmpty ? "Requerido" : null,
+            ),
+            TextFormField(
+              controller: ubicacion,
+              decoration: const InputDecoration(labelText: "Ubicación"),
+              validator: (v) => v!.isEmpty ? "Requerido" : null,
+            ),
+            TextFormField(
+              controller: descripcion,
+              decoration: const InputDecoration(labelText: "Descripción"),
+              validator: (v) => v!.isEmpty ? "Requerido" : null,
+            ),
+          ],
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
-        ElevatedButton(onPressed: _save, child: const Text('Guardar')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Cancelar"),
+        ),
+        ElevatedButton(
+          onPressed: _save,
+          child: const Text("Guardar"),
+        ),
       ],
     );
   }

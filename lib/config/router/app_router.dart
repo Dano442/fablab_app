@@ -2,18 +2,14 @@ import 'package:fablab_app/presentation/screens/profile/profile_details_screen';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-// --- Autenticación ---
 import 'package:fablab_app/presentation/screens/auth/login_screen.dart';
 import 'package:fablab_app/presentation/screens/auth/splash_screen.dart';
 
-//  Perfil 
 import 'package:fablab_app/presentation/screens/profile/profile_screen.dart';
 import 'package:fablab_app/presentation/screens/profile/profile_themes_screen.dart';
 
-//  Solicitudes 
 import 'package:fablab_app/presentation/screens/request/request_screen.dart';
 
-//  Home y navegación principal 
 import 'package:fablab_app/presentation/screens/home/home_screen.dart';
 import 'package:fablab_app/presentation/screens/main_home/main_home_screen.dart';
 import 'package:fablab_app/presentation/screens/project/project_screen.dart';

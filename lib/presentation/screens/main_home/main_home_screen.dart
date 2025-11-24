@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fablab_app/data/services/metrics_service.dart';
 
 class MainHomeScreen extends StatefulWidget {
   const MainHomeScreen({super.key});
@@ -24,13 +25,13 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   }
 
   Future<void> _loadDashboardData() async {
-    await Future.delayed(const Duration(seconds: 1));
+    final metrics = await MetricsService().loadMetrics();
 
     setState(() {
-      totalProjects = 12;
-      totalUsers = 8;
-      totalNews = 5;
-      totalRequests = 3;
+      totalProjects = metrics["totalProjects"]!;
+      totalUsers = metrics["totalUsers"]!;
+      totalNews = metrics["totalNews"]!;
+      totalRequests = metrics["totalRequests"]!;
       isLoading = false;
     });
   }
@@ -78,11 +79,11 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
           padding: const EdgeInsets.all(10),
           child: isLoading
               ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView( 
+              : SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      //  Cabecera
+                      // CABECERA
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(
@@ -105,18 +106,19 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
                             Text(
                               'Monitorea tus métricas clave en tiempo real',
                               style: textTheme.bodyMedium?.copyWith(
-                                color: colors.onPrimaryContainer.withOpacity(0.8),
+                                color: colors.onPrimaryContainer
+                                    .withOpacity(0.8),
                               ),
                             ),
                           ],
                         ),
                       ),
+
                       const SizedBox(height: 24),
 
-                      //  Grid de métricas
+                      // GRID DE MÉTRICAS
                       GridView.builder(
-                        physics:
-                            const NeverScrollableScrollPhysics(), 
+                        physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: dashboardData.length,
                         gridDelegate:

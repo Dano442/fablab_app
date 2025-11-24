@@ -55,8 +55,36 @@ class _UsersScreenState extends State<UsersScreen> {
     }
   }
 
+  Future<bool> _confirmDelete(UserModel user) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: const Text('Eliminar Usuario'),
+            content: Text(
+              '¿Estás seguro de que deseas eliminar a "${user.nombre} ${user.apellido}"? Esta acción no se puede deshacer.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                child: const Text(
+                  'Eliminar',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
   Future<void> _deleteUser(UserModel user) async {
     if (user.id == null) return;
+
+    final confirm = await _confirmDelete(user);
+    if (!confirm) return;
 
     final ok = await _userService.deleteUser(user.id!);
     if (ok) {
@@ -93,13 +121,6 @@ class _UsersScreenState extends State<UsersScreen> {
     }).toList();
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openUserForm(),
-        label: const Text("Agregar Usuario"),
-        icon: const Icon(Icons.add),
-        backgroundColor: colors.primary,
-        foregroundColor: colors.onPrimary,
-      ),
       body: Column(
         children: [
           const SizedBox(height: 10),
@@ -137,7 +158,7 @@ class _UsersScreenState extends State<UsersScreen> {
                             return UserCard(
                               user: user,
                               onEdit: () => _openUserForm(user: user),
-                              onDelete: () => _deleteUser(user),
+                              onDelete: () => _deleteUser(user), // ← listo
                             );
                           },
                         ),

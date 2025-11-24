@@ -31,7 +31,6 @@ class UserCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Imagen de perfil o ícono genérico si no hay imagen
                 CircleAvatar(
                   radius: 35,
                   backgroundColor: colors.primaryContainer,
@@ -41,7 +40,6 @@ class UserCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 16),
 
-                // Información del usuario
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,7 +64,6 @@ class UserCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // Botones de acción
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
