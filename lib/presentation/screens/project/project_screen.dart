@@ -109,8 +109,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
     final filteredProjects = _projects.where((p) {
       final q = _searchQuery.toLowerCase();
       return p.titulo.toLowerCase().contains(q) ||
-          p.categoria.toLowerCase().contains(q) ||
-          p.descripcionProyecto.toLowerCase().contains(q);
+          (p.categoria?.toLowerCase().contains(q) ?? false) ||
+          (p.descripcionProyecto?.toLowerCase().contains(q) ?? false);
     }).toList();
 
     return Scaffold(
@@ -121,6 +121,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
         backgroundColor: colors.primary,
         foregroundColor: colors.onPrimary,
       ),
+
       body: Column(
         children: [
           const SizedBox(height: 12),
@@ -150,92 +151,45 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     : RefreshIndicator(
                         onRefresh: _loadProjects,
                         child: ListView.separated(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 80),
                           itemCount: filteredProjects.length,
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               const SizedBox(height: 16),
                           itemBuilder: (context, index) {
                             final project = filteredProjects[index];
 
-                            return Stack(
-                              children: [
-                                ProjectCard(
-                                  imageUrl: (project.imgUrl ?? "").isNotEmpty
-                                      ? project.imgUrl
-                                      : "https://picsum.photos/400?random=$index",
-                                  projectName: project.titulo,
-                                  projectStatus: project.categoria,
-                                  participants:
-                                      'Área: ${project.areaAplicacion}',
-                                  onTap: () async {
-                                    await showDialog(
-                                      context: context,
-                                      builder: (dialogContext) => AlertDialog(
-                                        title: Text(project.titulo),
-                                        content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(project.descripcionProyecto),
-                                            const SizedBox(height: 12),
-                                            Text(
-                                              "Fecha inicio: ${project.fechaInicio.toString().split('T')[0]}",
-                                            ),
-                                          ],
+                            return ProjectCard(
+                              project: project,
+                              onTap: () async {
+                                await showDialog(
+                                  context: context,
+                                  builder: (dialogContext) => AlertDialog(
+                                    title: Text(project.titulo),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(project.descripcionProyecto ??
+                                            "Sin descripción"),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          "Fecha inicio: ${project.fechaInicio != null ? project.fechaInicio!.toString().split('T')[0] : 'N/A'}",
                                         ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.of(dialogContext)
-                                                    .pop(),
-                                            child: const Text('Cerrar'),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-
-                                Positioned(
-                                  top: 12,
-                                  right: 12,
-                                  child: PopupMenuButton<String>(
-                                    icon: const Icon(Icons.more_vert),
-                                    onSelected: (value) {
-                                      if (value == 'edit') {
-                                        _openForm(project: project);
-                                      } else if (value == 'delete') {
-                                        _deleteProject(project.id);
-                                      }
-                                    },
-                                    itemBuilder: (context) => [
-                                      const PopupMenuItem(
-                                        value: 'edit',
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.edit,
-                                                color: Colors.blue),
-                                            SizedBox(width: 8),
-                                            Text('Editar'),
-                                          ],
-                                        ),
-                                      ),
-                                      const PopupMenuItem(
-                                        value: 'delete',
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.delete,
-                                                color: Colors.red),
-                                            SizedBox(width: 8),
-                                            Text('Eliminar'),
-                                          ],
-                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(dialogContext).pop(),
+                                        child: const Text('Cerrar'),
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
+                                );
+                              },
+                              onEdit: () => _openForm(project: project),
+                              onDelete: () => _deleteProject(project.id),
                             );
                           },
                         ),

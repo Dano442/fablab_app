@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fablab_app/data/services/metrics_service.dart';
@@ -71,6 +69,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
         'route': '/request',
       },
     ];
+    
 
     return Scaffold(
       backgroundColor: colors.surface,
@@ -83,7 +82,6 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // CABECERA
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(
@@ -104,10 +102,9 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Monitorea tus métricas clave en tiempo real',
+                              'Monitorea las métricas clave en tiempo real',
                               style: textTheme.bodyMedium?.copyWith(
-                                color: colors.onPrimaryContainer
-                                    .withOpacity(0.8),
+                                color: colors.onPrimaryContainer.withOpacity(0.8),
                               ),
                             ),
                           ],
@@ -116,7 +113,6 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
 
                       const SizedBox(height: 24),
 
-                      // GRID DE MÉTRICAS
                       GridView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,

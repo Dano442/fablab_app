@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:fablab_app/data/services/api_client.dart';
 import 'package:fablab_app/data/storage/secure_storage.dart';
@@ -5,111 +6,92 @@ import 'package:fablab_app/domain/models/project_model.dart';
 
 class ProjectService {
   final Dio _dio = ApiClient.createDio();
-
   final String baseUrl = '/proyectos';
 
-  // GET ALL
   Future<List<ProjectModel>> getAllProjects() async {
     try {
       final res = await _dio.get(baseUrl);
-
       final List data = res.data;
       return data.map((json) => ProjectModel.fromJson(json)).toList();
-    } catch (e) {
-      print("❌ Error cargando proyectos: $e");
+    } catch (_) {
       return [];
     }
   }
 
-  // CREATE (POST)
-  Future<bool> createProject(ProjectModel project) async {
+  Future<bool> createProject(ProjectModel project, {MultipartFile? image}) async {
     try {
       final token = await SecureStorage.getToken();
 
-      print("=== TOKEN POST ===");
-      print(token);
+      const int userId = 7;
 
-      final body = {
-        "titulo": project.titulo,
-        "categoria": project.categoria,
-        "descripcionProyecto": project.descripcionProyecto,
-        "areaAplicacion": project.areaAplicacion,
-        "imgUrl": project.imgUrl,
-        "fechaInicio": project.fechaInicio.toIso8601String(),
-        "usuarios": project.usuarios,
-        "hitoProyecto": project.hitoProyecto,
+      final Map<String, dynamic> jsonMap = {
+        "Titulo": project.titulo,
+        "Categoria": project.categoria ?? "",
+        "DescripcionProyecto": project.descripcionProyecto ?? "",
+        "AreaAplicacion": project.areaAplicacion ?? "",
+        "FechaInicio": (project.fechaInicio ?? DateTime.now()).toIso8601String(),
+        "Ids": [userId],
+        "ImgUrl": null,
       };
 
-      print("=== JSON ENVIADO AL POST ===");
-      print(body);
+      final formData = FormData.fromMap({
+        "DataProject": jsonEncode(jsonMap),
+        "ImgUrl": image
+      });
 
-      final response = await _dio.post(
+      final res = await _dio.post(
         baseUrl,
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-        ),
-        data: body,
+        data: formData,
+        options: Options(headers: {
+          "Authorization": "Bearer $token",
+        }),
       );
 
-      return response.statusCode == 200 || response.statusCode == 201;
-    } catch (e) {
-      print("❌ Error en POST");
-      print(e);
+      return res.statusCode == 200 || res.statusCode == 201;
+    } catch (_) {
       return false;
     }
   }
 
-  // UPDATE (PUT)
   Future<bool> updateProject(ProjectModel project) async {
     try {
       final token = await SecureStorage.getToken();
 
       final body = {
-        "id": project.id,
         "titulo": project.titulo,
         "categoria": project.categoria,
         "descripcionProyecto": project.descripcionProyecto,
         "areaAplicacion": project.areaAplicacion,
-        "imgUrl": project.imgUrl,
-        "fechaInicio": project.fechaInicio.toIso8601String(),
-        "usuarios": project.usuarios,
-        "hitoProyecto": project.hitoProyecto,
+        "fechaInicio": (project.fechaInicio ?? DateTime.now()).toIso8601String(),
       };
 
-      print("=== JSON ENVIADO AL PUT ===");
-      print(body);
-
-      final response = await _dio.put(
+      final res = await _dio.put(
         "$baseUrl/${project.id}",
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-        ),
         data: body,
+        options: Options(headers: {
+          "Authorization": "Bearer $token",
+        }),
       );
 
-      return response.statusCode == 200;
-    } catch (e) {
-      print("❌ Error en PUT");
-      print(e);
+      return res.statusCode == 204 || res.statusCode == 200;
+    } catch (_) {
       return false;
     }
   }
 
-  // DELETE
   Future<bool> deleteProject(int id) async {
     try {
       final token = await SecureStorage.getToken();
 
       final res = await _dio.delete(
         "$baseUrl/$id",
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-        ),
+        options: Options(headers: {
+          "Authorization": "Bearer $token",
+        }),
       );
 
       return res.statusCode == 200;
-    } catch (e) {
-      print("❌ Error eliminando proyecto: $e");
+    } catch (_) {
       return false;
     }
   }

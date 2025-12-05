@@ -11,7 +11,6 @@ class InventoryService {
       final data = response.data as List;
       return data.map((e) => InventoryModel.fromJson(e)).toList();
     } catch (e) {
-      print("Error GET inventario: $e");
       return [];
     }
   }
@@ -21,7 +20,6 @@ class InventoryService {
       await _dio.post('/inventario', data: item.toJsonPost());
       return true;
     } catch (e) {
-      print("Error POST inventario: $e");
       return false;
     }
   }
@@ -31,7 +29,6 @@ class InventoryService {
       await _dio.put('/inventario/$id', data: item.toJsonPut());
       return true;
     } catch (e) {
-      print("Error PUT inventario: $e");
       return false;
     }
   }
@@ -41,7 +38,6 @@ class InventoryService {
       await _dio.delete('/inventario/$id');
       return true;
     } catch (e) {
-      print("Error DELETE inventario: $e");
       return false;
     }
   }

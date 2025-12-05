@@ -26,25 +26,19 @@ class _ProjectFormState extends State<ProjectForm> {
     super.initState();
 
     _tituloController =
-        TextEditingController(text: widget.project?.titulo ?? '');
-
+        TextEditingController(text: widget.project?.titulo ?? "");
     _categoriaController =
-        TextEditingController(text: widget.project?.categoria ?? '');
-
+        TextEditingController(text: widget.project?.categoria ?? "");
     _descripcionController =
-        TextEditingController(text: widget.project?.descripcionProyecto ?? '');
-
+        TextEditingController(text: widget.project?.descripcionProyecto ?? "");
     _areaController =
-        TextEditingController(text: widget.project?.areaAplicacion ?? '');
-
+        TextEditingController(text: widget.project?.areaAplicacion ?? "");
     _imgUrlController =
-        TextEditingController(text: widget.project?.imgUrl ?? '');
+        TextEditingController(text: widget.project?.imgUrl ?? "");
 
-    // Fecha: si edita, usa la del backend; si crea, usa la de hoy
     final fecha = widget.project?.fechaInicio ?? DateTime.now();
-
     _fechaInicioController =
-        TextEditingController(text: fecha.toIso8601String().split('T')[0]);
+        TextEditingController(text: fecha.toIso8601String().split("T")[0]);
   }
 
   @override
@@ -59,24 +53,27 @@ class _ProjectFormState extends State<ProjectForm> {
   }
 
   void _submit() {
-    if (_formKey.currentState!.validate()) {
-      final date = DateTime.parse(_fechaInicioController.text.trim());
+    if (!_formKey.currentState!.validate()) return;
 
-      final newProject = ProjectModel(
-        id: widget.project?.id ?? 0,     // 0 cuando es nuevo
-        titulo: _tituloController.text.trim(),
-        categoria: _categoriaController.text.trim(),
-        descripcionProyecto: _descripcionController.text.trim(),
-        areaAplicacion: _areaController.text.trim(),
-        imgUrl: _imgUrlController.text.trim(),
-        fechaInicio: DateTime(date.year, date.month, date.day),
-        usuarios: widget.project?.usuarios ?? [],
-        hitoProyecto: widget.project?.hitoProyecto ?? [],
-      );
+    final date = DateTime.tryParse(_fechaInicioController.text.trim()) ??
+        DateTime.now();
 
-      widget.onSubmit(newProject);
-      Navigator.pop(context);
-    }
+    final newProject = ProjectModel(
+      id: widget.project?.id ?? 0,
+      titulo: _tituloController.text.trim(),
+      categoria: _categoriaController.text.trim(),
+      descripcionProyecto: _descripcionController.text.trim(),
+      areaAplicacion: _areaController.text.trim(),
+      imgUrl: _imgUrlController.text.trim().isEmpty
+          ? null
+          : _imgUrlController.text.trim(),
+      fechaInicio: date,
+      usuarios: widget.project?.usuarios ?? [],
+      hitoProyecto: widget.project?.hitoProyecto ?? [],
+    );
+
+    widget.onSubmit(newProject);
+    Navigator.pop(context);
   }
 
   @override
@@ -113,22 +110,19 @@ class _ProjectFormState extends State<ProjectForm> {
                 controller: _descripcionController,
                 decoration:
                     const InputDecoration(labelText: 'Descripción del proyecto'),
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Ingrese una descripción' : null,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Ingrese una descripción'
+                    : null,
               ),
               const SizedBox(height: 12),
 
               TextFormField(
                 controller: _areaController,
-                decoration: const InputDecoration(labelText: 'Área de aplicación'),
+                decoration:
+                    const InputDecoration(labelText: 'Área de aplicación'),
               ),
               const SizedBox(height: 12),
 
-              TextFormField(
-                controller: _imgUrlController,
-                decoration:
-                    const InputDecoration(labelText: 'URL de imagen (opcional)'),
-              ),
               const SizedBox(height: 12),
 
               TextFormField(

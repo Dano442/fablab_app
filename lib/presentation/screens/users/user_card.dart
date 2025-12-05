@@ -21,9 +21,7 @@ class UserCard extends StatelessWidget {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -33,10 +31,12 @@ class UserCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 35,
-                  backgroundColor: colors.primaryContainer,
-                  backgroundImage: const NetworkImage(
-                    'https://i.pravatar.cc/150?img=5',
-                  ),
+                  backgroundImage:
+                      (user.imgUrl != null && user.imgUrl!.isNotEmpty)
+                          ? NetworkImage(user.imgUrl!)
+                          : const NetworkImage(
+                            'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+                          ),
                 ),
                 const SizedBox(width: 16),
 

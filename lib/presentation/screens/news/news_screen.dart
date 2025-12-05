@@ -29,7 +29,6 @@ class _NewsScreenState extends State<NewsScreen> {
 
     final fetched = await _service.getAllNews();
 
-    // Ordenar por fecha DESC
     fetched.sort((a, b) {
       final fa = a.fechaPublicacion ?? DateTime(1990);
       final fb = b.fechaPublicacion ?? DateTime(1990);
@@ -53,7 +52,6 @@ class _NewsScreenState extends State<NewsScreen> {
           bool ok;
 
           if (news == null) {
-            // CREAR
             ok = await _service.createNews(noticia);
             if (ok) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -61,7 +59,6 @@ class _NewsScreenState extends State<NewsScreen> {
               );
             }
           } else {
-            // EDITAR
             ok = await _service.updateNews(noticia);
             if (ok) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -98,15 +95,22 @@ class _NewsScreenState extends State<NewsScreen> {
       ),
     );
 
-    if (confirmed == true) {
-      final ok = await _service.deleteNews(id);
-      if (ok) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Noticia eliminada")),
-        );
-        await _loadNews();
-      }
-    }
+if (confirmed == true) {
+  final ok = await _service.deleteNews(id);
+
+  if (!mounted) return;
+
+  if (ok) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Noticia eliminada")),
+    );
+
+    await _loadNews();
+
+    if (!mounted) return;
+  }
+}
+
   }
 
   @override
@@ -160,9 +164,9 @@ class _NewsScreenState extends State<NewsScreen> {
                     : RefreshIndicator(
                         onRefresh: _loadNews,
                         child: ListView.separated(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 80),
                           itemCount: filtered.length,
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               const SizedBox(height: 16),
                           itemBuilder: (_, index) {
                             final item = filtered[index];

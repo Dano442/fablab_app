@@ -25,7 +25,7 @@ class _InventoryFormState extends State<InventoryForm> {
     super.initState();
     nombre = TextEditingController(text: widget.item?.nombre ?? "");
     categoria = TextEditingController(text: widget.item?.categoria ?? "");
-    stock = TextEditingController(text: widget.item?.stock.toString() ?? "0");
+    stock = TextEditingController(text: widget.item?.stock.toString() ?? "");
     ubicacion = TextEditingController(text: widget.item?.ubicacion ?? "");
     descripcion = TextEditingController(text: widget.item?.descripcion ?? "");
   }

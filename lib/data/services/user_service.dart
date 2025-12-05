@@ -8,46 +8,57 @@ class UserService {
   Future<List<UserModel>> getAllUsers() async {
     try {
       final response = await _dio.get('/usuarios');
+
       if (response.statusCode == 200) {
         final data = response.data;
 
         if (data is List) {
           return data.map((e) => UserModel.fromJson(e)).toList();
-        } else {
-          return [];
         }
-      } else {
-        throw Exception('Error al obtener usuarios (${response.statusCode})');
+        return [];
       }
-    } catch (e) {
-      print('❌ Error al obtener usuarios: $e');
+
+      return [];
+    } catch (_) {
       return [];
     }
   }
-    Future<UserModel?> getUserById(int id) async {
+
+  Future<UserModel?> getUserByEmail(String email) async {
+    try {
+      final users = await getAllUsers();
+
+      for (final user in users) {
+        if (user.correoInstitucional.toLowerCase() == email.toLowerCase()) {
+          return user;
+        }
+      }
+
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<UserModel?> getUserById(int id) async {
     try {
       final response = await _dio.get('/usuarios/$id');
 
       if (response.statusCode == 200) {
         return UserModel.fromJson(response.data);
-      } else {
-        print('❌ Error al obtener usuario por ID (${response.statusCode})');
-        return null;
       }
 
-    } catch (e) {
-      print('❌ Error getUserById: $e');
+      return null;
+    } catch (_) {
       return null;
     }
   }
-
 
   Future<bool> addUser(UserModel user) async {
     try {
       await _dio.post('/usuarios', data: user.toJson());
       return true;
-    } catch (e) {
-      print('❌ Error al agregar usuario: $e');
+    } catch (_) {
       return false;
     }
   }
@@ -56,19 +67,17 @@ class UserService {
     try {
       await _dio.put('/usuarios/${user.id}', data: user.toJson());
       return true;
-    } catch (e) {
-      print('❌ Error al actualizar usuario: $e');
+    } catch (_) {
       return false;
     }
   }
 
-Future<bool> deleteUser(int id) async {
-  try {
-    await _dio.delete('/usuarios/$id');
-    return true;
-  } catch (e) {
-    print('Error al eliminar usuario: $e');
-    return false;
+  Future<bool> deleteUser(int id) async {
+    try {
+      await _dio.delete('/usuarios/$id');
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
-}
 }

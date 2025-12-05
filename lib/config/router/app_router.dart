@@ -35,7 +35,7 @@ final appRouter = GoRouter(
     ),
 
     ShellRoute(
-      builder: (context, state, child) => HomeScreen(child: child),
+      builder: (context, state, child) => HomeScreen(child: child),//ojo
       routes: [
         GoRoute(
           path: '/main_home',

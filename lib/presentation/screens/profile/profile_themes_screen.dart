@@ -1,7 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:fablab_app/config/theme/app_theme.dart';
-import 'package:fablab_app/main.dart'; // 
+import 'package:fablab_app/main.dart';
 
 class ProfileThemesScreen extends StatelessWidget {
   const ProfileThemesScreen({super.key});
@@ -10,6 +9,7 @@ class ProfileThemesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final themeState = MainApp.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -18,14 +18,33 @@ class ProfileThemesScreen extends StatelessWidget {
         foregroundColor: colors.onPrimary,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: colors.onPrimary),
-          onPressed: () => Navigator.pop(context), // 
+          onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SwitchListTile(
+              title: const Text("Modo oscuro"),
+              value: themeState.isDarkMode,
+              onChanged: (value) {
+                themeState.setDarkMode(value);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      value ? "Modo oscuro activado" : "Modo claro activado",
+                    ),
+                    behavior: SnackBarBehavior.floating,
+                    duration: const Duration(seconds: 1),
+                  ),
+                );
+              },
+            ),
+
+            const SizedBox(height: 20),
+
             Text(
               'Selecciona un color para el tema:',
               style: textTheme.titleLarge?.copyWith(
@@ -41,7 +60,7 @@ class ProfileThemesScreen extends StatelessWidget {
                 final color = colorList[index];
                 return GestureDetector(
                   onTap: () {
-                    MainApp.of(context).setTheme(index);
+                    themeState.setTheme(index);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Tema cambiado correctamente'),

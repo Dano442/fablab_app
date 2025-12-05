@@ -1,6 +1,7 @@
 import 'package:fablab_app/data/services/auth_service.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:fablab_app/domain/models/user_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
   (ref) => AuthNotifier(),
@@ -17,8 +18,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     final loggedIn = await _authService.isLoggedIn();
 
     if (loggedIn) {
-      // Por ahora NO tenemos getProfile(),
-      // así que dejamos user en null hasta que tu backend exponga un endpoint.
+
       state = state.copyWith(
         isAuthenticated: true,
         status: AuthStatus.authenticated,

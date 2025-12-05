@@ -151,14 +151,14 @@ class _UsersScreenState extends State<UsersScreen> {
                         child: ListView.separated(
                           padding: const EdgeInsets.all(12),
                           itemCount: filtered.length,
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               const SizedBox(height: 16),
                           itemBuilder: (_, index) {
                             final user = filtered[index];
                             return UserCard(
                               user: user,
                               onEdit: () => _openUserForm(user: user),
-                              onDelete: () => _deleteUser(user), // ← listo
+                              onDelete: () => _deleteUser(user), 
                             );
                           },
                         ),

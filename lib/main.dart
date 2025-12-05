@@ -20,6 +20,9 @@ class MainApp extends StatefulWidget {
 
 class MainAppState extends State<MainApp> {
   int _selectedColorIndex = 0;
+  bool _isDarkMode = false; 
+  bool get isDarkMode => _isDarkMode;
+
   final _storage = const FlutterSecureStorage();
 
   @override
@@ -28,27 +31,39 @@ class MainAppState extends State<MainApp> {
     _loadTheme();
   }
 
-
   Future<void> _loadTheme() async {
     final savedIndex = await _storage.read(key: 'themeIndex');
+    final savedDarkMode = await _storage.read(key: 'isDarkMode');
+
     if (savedIndex != null) {
-      setState(() {
-        _selectedColorIndex = int.tryParse(savedIndex) ?? 0;
-      });
+      _selectedColorIndex = int.tryParse(savedIndex) ?? 0;
     }
+
+    if (savedDarkMode != null) {
+      _isDarkMode = savedDarkMode == 'true';
+    }
+
+    setState(() {});
   }
 
-  /// Cambia y guarda el nuevo tema
   void setTheme(int newIndex) async {
-    setState(() {
-      _selectedColorIndex = newIndex;
-    });
+    _selectedColorIndex = newIndex;
+    setState(() {});
     await _storage.write(key: 'themeIndex', value: newIndex.toString());
+  }
+
+  void setDarkMode(bool value) async {
+    _isDarkMode = value;
+    setState(() {});
+    await _storage.write(key: 'isDarkMode', value: value.toString());
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppTheme(selectedColor: _selectedColorIndex).getTheme();
+    final theme = AppTheme(
+      selectedColor: _selectedColorIndex,
+      isDarkMode: _isDarkMode, 
+    ).getTheme();
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,

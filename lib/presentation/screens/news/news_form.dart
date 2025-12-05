@@ -60,7 +60,6 @@ class _NewsFormState extends State<NewsForm> {
       fechaPublicacion: widget.news?.fechaPublicacion ?? DateTime.now(),
       contenido: _contenidoController.text.trim(),
 
-      // -------- CORREGIDO: solo enviamos URL válida, si no → null --------
       imageUrlPrincipal: _isValidUrl(_imgPrincipalController.text)
           ? _imgPrincipalController.text.trim()
           : null,
@@ -68,7 +67,6 @@ class _NewsFormState extends State<NewsForm> {
       imageUrlAutor: _isValidUrl(_imgAutorController.text)
           ? _imgAutorController.text.trim()
           : null,
-      // --------------------------------------------------------------------
 
       estado: estado,
     );

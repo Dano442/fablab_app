@@ -1,48 +1,29 @@
-import 'package:fablab_app/domain/models/request_model.dart';
+import 'package:dio/dio.dart';
 
 class RequestService {
-  final List<RequestModel> _requests = [
-    RequestModel(
-      id: '1',
-      title: 'Uso de Impresora 3D',
-      description:
-          'Solicitud para imprimir piezas de un prototipo de robot educativo.',
-      requester: 'Daniel Ronceros',
-      status: 'Pendiente',
-      date: DateTime(2025, 10, 21),
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: 'https://fablabwebapi20251104221404-crbeb0b9cafvhqg3.canadacentral-01.azurewebsites.net/api',
     ),
-    RequestModel(
-      id: '2',
-      title: 'Corte Láser en MDF',
-      description:
-          'Solicitud para corte láser de estructuras para proyecto de maqueta.',
-      requester: 'Alexis Pérez',
-      status: 'Aprobada',
-      date: DateTime(2025, 10, 18),
-    ),
-    RequestModel(
-      id: '3',
-      title: 'Préstamo de Arduino UNO',
-      description:
-          'Solicitud para préstamo de kit Arduino para prácticas de automatización.',
-      requester: 'María Gutiérrez',
-      status: 'Rechazada',
-      date: DateTime(2025, 10, 15),
-    ),
-  ];
+  );
+  
+  Future<List<dynamic>> getRequests() async {
+    final response = await _dio.get('/notificaciones/ingreso');
 
-  List<RequestModel> getAll() => List.unmodifiable(_requests);
-
-  void add(RequestModel request) {
-    _requests.add(request);
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      throw Exception("Error al cargar solicitudes");
+    }
   }
 
-  void update(RequestModel updated) {
-    final index = _requests.indexWhere((r) => r.id == updated.id);
-    if (index != -1) _requests[index] = updated;
+  Future<bool> approveRequest(int id) async {
+    final response = await _dio.post('/notificaciones/ingreso/$id');
+    return response.statusCode == 200;
   }
 
-  void delete(String id) {
-    _requests.removeWhere((r) => r.id == id);
+  Future<bool> rejectRequest(int id) async {
+    final response = await _dio.delete('/notificaciones/ingreso/$id');
+    return response.statusCode == 200;
   }
 }

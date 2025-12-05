@@ -25,7 +25,6 @@ class AuthService {
 
       return false;
     } catch (e) {
-      print("Error en login: $e");
       return false;
     }
   }
@@ -41,12 +40,10 @@ class AuthService {
 
       return response.statusCode == 200;
     } catch (e) {
-      print("Error en check-status: $e");
       return false;
     }
   }
 
-  /// VALIDACIÓN REAL DE SESIÓN
   Future<bool> isLoggedIn() async {
     final token = await SecureStorage.getToken();
     if (token == null) return false;

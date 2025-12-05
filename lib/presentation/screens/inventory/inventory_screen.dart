@@ -13,7 +13,7 @@ class InventoryScreen extends StatefulWidget {
 class _InventoryScreenState extends State<InventoryScreen> {
   final InventoryService _service = InventoryService();
   String calcularEstado(int stock) {
-    if(stock <= 0) return "No Disponible";
+    if (stock <= 0) return "No Disponible";
     if (stock < 3) return "Bajo Stock";
     if (stock < 10) return "Medio";
     return "Disponible";
@@ -40,37 +40,36 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   void _showMessage(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        duration: const Duration(seconds: 2),
-      ),
+      SnackBar(content: Text(msg), duration: const Duration(seconds: 2)),
     );
   }
 
   void _openCreateForm() {
     showDialog(
       context: context,
-      builder: (_) => InventoryForm(
-        onSubmit: (newItem) async {
-          await _service.createInventory(newItem);
-          await _loadInventory();
-          _showMessage("Ítem creado");
-        },
-      ),
+      builder:
+          (_) => InventoryForm(
+            onSubmit: (newItem) async {
+              await _service.createInventory(newItem);
+              await _loadInventory();
+              _showMessage("Ítem creado");
+            },
+          ),
     );
   }
 
   void _openEditForm(InventoryModel item) {
     showDialog(
       context: context,
-      builder: (_) => InventoryForm(
-        item: item,
-        onSubmit: (updatedItem) async {
-          await _service.updateInventory(item.id!, updatedItem);
-          await _loadInventory();
-          _showMessage("Ítem actualizado");
-        },
-      ),
+      builder:
+          (_) => InventoryForm(
+            item: item,
+            onSubmit: (updatedItem) async {
+              await _service.updateInventory(item.id!, updatedItem);
+              await _loadInventory();
+              _showMessage("Ítem actualizado");
+            },
+          ),
     );
   }
 
@@ -85,15 +84,16 @@ class _InventoryScreenState extends State<InventoryScreen> {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final filtered = _items.where((item) {
-      final q = _searchQuery.toLowerCase();
-      return item.nombre.toLowerCase().contains(q) ||
-          item.categoria.toLowerCase().contains(q) ||
-          item.ubicacion.toLowerCase().contains(q);
-    }).toList();
+    final filtered =
+        _items.where((item) {
+          final q = _searchQuery.toLowerCase();
+          return item.nombre.toLowerCase().contains(q) ||
+              item.categoria.toLowerCase().contains(q) ||
+              item.ubicacion.toLowerCase().contains(q);
+        }).toList();
 
     final totalItems = _items.length;
-    final lowStock = _items.where((i) => i.stock < 3).length;
+    final lowStock = _items.where((i) => i.stock >= 1 && i.stock <=5 ).length;
     final sinStock = _items.where((i) => i.stock <= 0).length;
 
     return Scaffold(
@@ -123,7 +123,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     icon: Icons.block_flipped,
                     label: "Sin Stock",
                     value: sinStock.toString(),
-                    color: colors.error,
+                    color: Colors.red,
                   ),
                 ],
               ),
@@ -150,104 +150,110 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 child: RefreshIndicator(
                   onRefresh: () async {
                     await _loadInventory();
-                    _showMessage("Inventario actualizado");
                   },
-                  child: _isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : ListView.separated(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 80),
-                          itemCount: filtered.length,
-                          separatorBuilder: (_, __) =>
-                              const Divider(height: 12),
-                          itemBuilder: (_, i) {
-                            final item = filtered[i];
-                            
+                  child:
+                      _isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : ListView.separated(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 80),
+                            itemCount: filtered.length,
+                            separatorBuilder:
+                                (_, _) => const Divider(height: 12),
+                            itemBuilder: (_, i) {
+                              final item = filtered[i];
 
-                            final stockColor = item.stock < 3
-                                ? colors.error
-                                : item.stock < 10
-                                    ? colors.tertiary
-                                    : colors.primary;
+                              final stockColor =
+                                  item.stock < 3
+                                      ? colors.error
+                                      : item.stock < 10
+                                      ? colors.tertiary
+                                      : colors.primary;
 
-                            return Card(
-                              elevation: 3,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.all(12),
-                                leading: Icon(
-                                  Icons.inventory_2_outlined,
-                                  color: stockColor,
-                                  size: 32,
+                              return Card(
+                                elevation: 3,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                title: Text(
-                                  item.nombre,
-                                  style: textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.all(12),
+                                  leading: Icon(
+                                    Icons.inventory_2_outlined,
+                                    color: stockColor,
+                                    size: 32,
+                                  ),
+                                  title: Text(
+                                    item.nombre,
+                                    style: textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "${item.categoria} • ${item.ubicacion}",
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.bar_chart,
+                                            size: 16,
+                                            color: Colors.grey,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            "Stock: ${item.stock}",
+                                            style: TextStyle(
+                                              color: stockColor,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+
+                                  trailing: PopupMenuButton(
+                                    onSelected: (value) {
+                                      if (value == 'edit') {
+                                        _openEditForm(item);
+                                      } else if (value == 'delete') {
+                                        _deleteItem(item);
+                                      }
+                                    },
+                                    itemBuilder:
+                                        (_) => const [
+                                          PopupMenuItem(
+                                            value: 'edit',
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.edit, size: 18),
+                                                SizedBox(width: 8),
+                                                Text("Editar"),
+                                              ],
+                                            ),
+                                          ),
+                                          PopupMenuItem(
+                                            value: 'delete',
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.delete, size: 18),
+                                                SizedBox(width: 8),
+                                                Text("Eliminar"),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                   ),
                                 ),
-                                subtitle: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                  children: [
-                                    Text("${item.categoria} • ${item.ubicacion}"),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.bar_chart,
-                                            size: 16, color: Colors.grey),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          "Stock: ${item.stock}",
-                                          style: TextStyle(
-                                            color: stockColor,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-
-                                trailing: PopupMenuButton(
-                                  onSelected: (value) {
-                                    if (value == 'edit') {
-                                      _openEditForm(item);
-                                    } else if (value == 'delete') {
-                                      _deleteItem(item);
-                                    }
-                                  },
-                                  itemBuilder: (_) => const [
-                                    PopupMenuItem(
-                                      value: 'edit',
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.edit, size: 18),
-                                          SizedBox(width: 8),
-                                          Text("Editar"),
-                                        ],
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      value: 'delete',
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.delete, size: 18),
-                                          SizedBox(width: 8),
-                                          Text("Eliminar"),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                              );
+                            },
+                          ),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -255,14 +261,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openCreateForm,
+        icon: const Icon(Icons.add),
+        label: const Text("Nuevo ítem"),
         backgroundColor: colors.primary,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text(
-          "Nuevo ítem",
-          style: TextStyle(color: Colors.white),
+        foregroundColor: colors.onPrimary,
         ),
-      ),
-    );
+        
+      );
   }
 
   Widget _buildDashboardCard({
@@ -283,7 +288,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
               color: color.withOpacity(0.4),
               blurRadius: 6,
               offset: const Offset(2, 4),
-            )
+            ),
           ],
         ),
         child: Column(
@@ -302,10 +307,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
             const SizedBox(height: 2),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-              ),
+              style: const TextStyle(color: Colors.white, fontSize: 12),
             ),
           ],
         ),

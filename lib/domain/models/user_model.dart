@@ -11,6 +11,7 @@ class UserModel {
   final int rolId;
   final String tipoRol;
   final String descripcionRol;
+  final String? imgUrl; 
 
   UserModel({
     this.id,
@@ -25,6 +26,7 @@ class UserModel {
     required this.rolId,
     required this.tipoRol,
     required this.descripcionRol,
+    this.imgUrl,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -44,6 +46,7 @@ class UserModel {
       rolId: json["rolId"] ?? 0,
       tipoRol: rol["tipoRol"] ?? "",
       descripcionRol: rol["descripcionRol"] ?? "",
+      imgUrl: json["imgUrl"],
     );
   }
 
@@ -57,6 +60,7 @@ class UserModel {
       "telefono": telefono,
       "laboratorioId": laboratorioId,
       "rolId": rolId,
+      "imgUrl": imgUrl,
     };
 
     if (id != null) {
@@ -64,6 +68,37 @@ class UserModel {
     }
 
     return data;
+  }
+  UserModel copyWith({
+    int? id,
+    String? nombre,
+    String? apellido,
+    String? rut,
+    String? correoInstitucional,
+    String? carrera,
+    String? telefono,
+    int? laboratorioId,
+    String? laboratorio,
+    int? rolId,
+    String? tipoRol,
+    String? descripcionRol,
+    String? imgUrl,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      nombre: nombre ?? this.nombre,
+      apellido: apellido ?? this.apellido,
+      rut: rut ?? this.rut,
+      correoInstitucional: correoInstitucional ?? this.correoInstitucional,
+      carrera: carrera ?? this.carrera,
+      telefono: telefono ?? this.telefono,
+      laboratorioId: laboratorioId ?? this.laboratorioId,
+      laboratorio: laboratorio ?? this.laboratorio,
+      rolId: rolId ?? this.rolId,
+      tipoRol: tipoRol ?? this.tipoRol,
+      descripcionRol: descripcionRol ?? this.descripcionRol,
+      imgUrl: imgUrl ?? this.imgUrl,
+    );
   }
 
   String get nombreCompleto => "$nombre $apellido";
