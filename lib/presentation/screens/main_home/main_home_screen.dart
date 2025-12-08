@@ -1,3 +1,5 @@
+import 'package:fablab_app/data/services/local_notification_service.dart';
+import 'package:fablab_app/data/services/registro_monitor_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fablab_app/data/services/metrics_service.dart';
@@ -16,10 +18,13 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   int totalRequests = 0;
   bool isLoading = true;
 
+final RegistroMonitorService _monitor = RegistroMonitorService();
+
   @override
   void initState() {
     super.initState();
     _loadDashboardData();
+    _monitor.iniciarMonitoreo();
   }
 
   Future<void> _loadDashboardData() async {
@@ -104,7 +109,6 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
                             Text(
                               'Monitorea las métricas clave en tiempo real',
                               style: textTheme.bodyMedium?.copyWith(
-                                color: colors.onPrimaryContainer.withOpacity(0.8),
                               ),
                             ),
                           ],
@@ -140,9 +144,22 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
                 ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+  onPressed: () {
+    LocalNotificationService.showNotification(
+      title: "Prueba FabLab",
+      body: "Notificación local funcionando",
     );
+  },
+  child: const Icon(Icons.notifications_active),
+),
+
+    );
+    
   }
+  
 }
+
 
 class _DashboardCard extends StatelessWidget {
   final String title;
@@ -167,7 +184,6 @@ class _DashboardCard extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
-      splashColor: color.withOpacity(0.3),
       child: Card(
         elevation: 6,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -178,7 +194,7 @@ class _DashboardCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
-                backgroundColor: color.withOpacity(0.15),
+                backgroundColor: color.withValues(alpha: 0.15),
                 radius: 28,
                 child: Icon(icon, color: color, size: 30),
               ),

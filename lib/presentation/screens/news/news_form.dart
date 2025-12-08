@@ -131,17 +131,8 @@ class _NewsFormState extends State<NewsForm> {
                       v == null || v.isEmpty ? "Ingrese el contenido" : null,
                 ),
 
-                TextFormField(
-                  controller: _imgPrincipalController,
-                  decoration:
-                      const InputDecoration(labelText: "Imagen Principal (URL)"),
-                ),
 
-                TextFormField(
-                  controller: _imgAutorController,
-                  decoration:
-                      const InputDecoration(labelText: "Imagen Autor (URL)"),
-                ),
+
 
                 DropdownButtonFormField(
                   initialValue: estado,

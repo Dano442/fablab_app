@@ -32,7 +32,6 @@ class _RequestScreenState extends State<RequestScreen> {
         _loading = false;
       });
     } catch (e) {
-      print("Error: $e");
       setState(() => _loading = false);
     }
   }
@@ -64,8 +63,6 @@ class _RequestScreenState extends State<RequestScreen> {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    // Mapeo: el backend usa Nombre, Apellido, Email, Carrera, etc.
-    // Tú puedes mostrar lo que quieras.
     final filtered = _requests.where((r) {
       final title = r["nombre"] ?? "";
       final desc = r["carrera"] ?? "";
@@ -108,7 +105,6 @@ class _RequestScreenState extends State<RequestScreen> {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    // BUSCADOR
                     Row(
                       children: [
                         Expanded(

@@ -88,21 +88,12 @@ class _ProjectCardState extends State<ProjectCard> {
                     SizedBox(
                       height: 150,
                       width: double.infinity,
-                      child: FadeInImage.assetNetwork(
-                        placeholder: 'assets/placeholder.png',
-                        image:
-                            project.imgUrl?.isNotEmpty == true
-                                ? project.imgUrl!
-                                : "https://via.placeholder.com/400x300?text=Sin+Imagen",
+                      child: Image.network(
+                        project.imgUrl ?? "",
                         fit: BoxFit.cover,
-                        imageErrorBuilder:
-                            (_, _, _) => Center(
-                              child: Icon(
-                                Icons.broken_image,
-                                size: 50,
-                                color: colors.error,
-                              ),
-                            ),
+                        errorBuilder:
+                            (_, _, _) => 
+                            const Center(child: Icon(Icons.broken_image, size: 60)),
                       ),
                     ),
 
@@ -175,7 +166,6 @@ class _ProjectCardState extends State<ProjectCard> {
                   ],
                 ),
 
-                /// MENU DE OPCIONES
                 Positioned(
                   top: 8,
                   right: 8,

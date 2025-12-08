@@ -3,8 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fablab_app/config/theme/app_theme.dart';
 import 'package:fablab_app/config/router/app_router.dart';
+import 'package:fablab_app/data/services/local_notification_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await LocalNotificationService.initialize();
+
   runApp(const ProviderScope(child: MainApp()));
 }
 
@@ -20,7 +25,7 @@ class MainApp extends StatefulWidget {
 
 class MainAppState extends State<MainApp> {
   int _selectedColorIndex = 0;
-  bool _isDarkMode = false; 
+  bool _isDarkMode = false;
   bool get isDarkMode => _isDarkMode;
 
   final _storage = const FlutterSecureStorage();
@@ -62,7 +67,7 @@ class MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     final theme = AppTheme(
       selectedColor: _selectedColorIndex,
-      isDarkMode: _isDarkMode, 
+      isDarkMode: _isDarkMode,
     ).getTheme();
 
     return MaterialApp.router(

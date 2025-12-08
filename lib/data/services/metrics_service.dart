@@ -9,18 +9,27 @@ class MetricsService {
       "totalProjects": await _countItems('/proyectos'),
       "totalUsers": await _countItems('/usuarios'),
       "totalNews": await _countItems('/noticias'),
-      "totalRequests": await _countItems('/solicitudes'),
+      "totalRequests": await _countItems('/notificaciones/ingreso'),
     };
   }
 
   Future<int> _countItems(String endpoint) async {
     try {
       final res = await _dio.get(endpoint);
-      if (res.statusCode == 200 && res.data is List) {
-        return (res.data as List).length;
+      final data = res.data;
+
+      if (data is List) {
+        return data.length;
       }
+
+      if (data is Map) {
+        if (data.isEmpty) return 0;
+        return 1;
+      }
+
     } catch (_) {
     }
+
     return 0;
   }
 }

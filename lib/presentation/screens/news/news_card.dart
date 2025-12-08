@@ -96,8 +96,8 @@ class NewsCard extends StatelessWidget {
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: news.estado == "Activo"
-                              ? colors.primary.withOpacity(0.15)
-                              : Colors.red.withOpacity(0.15),
+                              ? colors.primary.withValues(alpha: 0.15)
+                              : Colors.red.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
